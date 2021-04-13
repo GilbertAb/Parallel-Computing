@@ -1,1 +1,4 @@
 hello
+hello_asan
+hello_msan
+hello_tsan
