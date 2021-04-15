@@ -15,6 +15,14 @@ hello_msan: main.c
 hello_tsan: main.c
 	cc -g -Wall -Wextra -fsanitize=thread main.c -o hello_tsan -pthread
 
+.PHONY: memcheck
+memcheck:
+	valgrind ./hello
+
+.PHONY: helgrind
+helgrind:
+	valgrind --tool=helgrind --quiet ./hello
+
 .PHONY: rebuild
 rebuild: clean hello hello_asan hello_msan hello_tsan
 
