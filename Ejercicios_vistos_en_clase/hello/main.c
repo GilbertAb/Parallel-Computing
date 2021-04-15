@@ -1,4 +1,5 @@
-// Cpyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+// Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,8 +7,8 @@
 void* run(void* data);
 
 int main(void) {
-  pthread_t thread;  // a register is created to control the thread
-  if( pthread_create( &thread, /*attribute*/ NULL, run, (void*)13 ) == EXIT_SUCCESS) {
+  pthread_t thread;
+  if (pthread_create(&thread, /*attr*/ NULL, run, (void*)13) == EXIT_SUCCESS) {
     printf("Hello from main thread\n");
     pthread_join(thread, /*value_ptr*/ NULL);
     return EXIT_SUCCESS;
