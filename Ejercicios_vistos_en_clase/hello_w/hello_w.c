@@ -3,23 +3,35 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 void* run(void* data);
 
-int main(void) {
-  pthread_t thread;
-  if (pthread_create(&thread, /*attr*/ NULL, run, (void*)13) == EXIT_SUCCESS) {
-    printf("Hello from main thread\n");
-    pthread_join(thread, /*value_ptr*/ NULL);
-    return EXIT_SUCCESS;
-  } else {
-    fprintf(stderr, "could not create secundary thread\n");
-    return EXIT_FAILURE;
+int main(int argc, char* argv[]) {
+  size_t thread_count = sysconf(_SC_NPROCESSORS_ONLN);
+  if (argc == 2 /*&& sscanf(argv[1], "%zu", &thread_count)*/){
+    if(sscanf(argv[1], "%zu", &thread_count) != 1) {
+	  fprintf(stderr,"error: invalid thread count");
+	  return EXIT_FAILURE;
+	}
   }
+	
+  pthread_t thread[thread_count];
+  for (size_t index = 0; index < thread_count; ++index) {
+    if (pthread_create(&thread[index], /*attr*/ NULL, run, (void*)index)
+        == EXIT_SUCCESS) {
+      pthread_join(thread[index], /*value_ptr*/ NULL);
+    } else {
+      fprintf(stderr, "could not create secundary thread\n");
+      return EXIT_FAILURE;
+    }
+  } 
+  printf("Hello from main thread\n");
+  return EXIT_SUCCESS;
 }
 
 void* run(void* data) {
-  printf("Hello from secundary thread\n");
-  printf("data = %p\n", data);
+  const size_t thread_number = (size_t)data;
+  printf("Hello from secundary thread %zu\n", thread_number);
   return NULL;
 }
