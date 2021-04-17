@@ -1,0 +1,4 @@
+goldbach_serial
+goldbach_serial_asan
+goldbach_serial_msan
+goldbach_serial_tsan
