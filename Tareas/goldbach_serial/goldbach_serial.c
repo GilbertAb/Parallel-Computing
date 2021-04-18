@@ -1,13 +1,15 @@
 #include <inttypes.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #define MAXPRIMES 1000000
 
 char* goldbach(int64_t * number, int64_t * primes);
-char* goldbach_strong_conjecture(int64_t * number, int64_t * primes);
-char* goldbach_weak_conjecture(int64_t * number, int64_t * primes);
+char* goldbach_strong_conjecture(int64_t number, int64_t * primes);
+char* goldbach_weak_conjecture(int64_t number, int64_t * primes);
 
 int64_t * eratostenes_sieve(int64_t maxNum);
 
@@ -32,9 +34,9 @@ char* goldbach(int64_t * number, int64_t * primes) {
   char* goldbach= "";
   
   if(*number % 2 == 0){
-    goldbach = goldbach_strong_conjecture(number, primes);
+    goldbach = goldbach_strong_conjecture(*number, primes);
   }else{
-    goldbach = goldbach_weak_conjecture(number, primes);
+    goldbach = goldbach_weak_conjecture(*number, primes);
   }
   
   eratostenes_sieve(MAXPRIMES);
@@ -43,53 +45,60 @@ char* goldbach(int64_t * number, int64_t * primes) {
 }
 
 //Para pares
-char* goldbach_strong_conjecture(int64_t * number, int64_t * primes){
-  char* a = "";
-  
-  //char * goldbachSums = malloc(sizeof(char) * MAXPRIMES);
-  int64_t primesSize = MAXPRIMES;
-  int64_t n = *number / 2;
-  int64_t num = *number;
+char* goldbach_strong_conjecture(int64_t number, int64_t * primes){
+  char* a = ""; 
+  bool negative = false;
+  int64_t n = number / 2;
   int64_t amountSums = 0;
+   
+  if(number < 0){
+    negative = true;
+    number *= -1;
+    n *= -1; 
+  }      
   
   for(int i = 0; i < n; i++){
-    for(int j = i; j < num; j++){
-      if(primes[i] + primes[j] == *number){
+    for(int j = i; j < number; j++){
+      if(primes[i] + primes[j] == number){
         ++amountSums;
       }
       
     }  
   }
-  printf("%"SCNd64 "%s" "%"SCNd64 "%s", *number," sums: ", amountSums,"\n");
+  printf("%"SCNd64 "%s" "%"SCNd64 "%s", number," sums: ", amountSums,"\n");
   
   return a;
 }
-char* goldbach_weak_conjecture(int64_t * number, int64_t * primes){
+char* goldbach_weak_conjecture(int64_t number, int64_t * primes){
   char* a = "";
-  
-  int64_t primesSize = MAXPRIMES;
-  int64_t n = *number / 2;
-  int64_t num = *number;
+  bool negative = false;
+  int64_t n = number / 2;
   int64_t amountSums = 0;
+   
+  if(number < 0){
+    negative = true;
+    number *= -1;
+    n *= -1; 
+  }
   
   for(int i = 0; i < n; i++){
-    for(int j = i; j < num; j++){
-      for(int k = j; k < num; k++){
-        if(primes[i] + primes[j] + primes[k] == *number){
+    for(int j = i; j < number; j++){
+      for(int k = j; k < number; k++){
+        if(primes[i] + primes[j] + primes[k] == number){
           ++amountSums;
         }
       }      
     }  
   }
-  printf("%"SCNd64 "%s" "%"SCNd64 "%s", *number," sums: ", amountSums,"\n");
+  printf("%"SCNd64 "%s" "%"SCNd64 "%s", number," sums: ", amountSums,"\n");
   
   
   return a;
 }
 
 int64_t * eratostenes_sieve(int64_t maxNum){   
-  int64_t * primes = malloc(sizeof(int64_t) * MAXPRIMES);
-  //int64_t * primes = calloc(MAXPRIMES, sizeof(int64_t));
+  //int64_t * primes = malloc(sizeof(int64_t) * MAXPRIMES);
+  int64_t * primes = calloc(MAXPRIMES, sizeof(int64_t));
 
   int64_t amountPrimes = 0;
   int64_t prime = 0;
