@@ -1,11 +1,9 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 #include <inttypes.h>
-#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 
 #define MAXPRIMES 1000000
 #define MAXNUMBERS 1000000
@@ -17,19 +15,19 @@ int64_t* goldbach_weak_conjecture(int64_t number, int64_t * primes);
 void print_goldbach_sums(int64_t number, int64_t * goldbachSums);
 bool is_even_number(int64_t number);
 
+/**
+ * @return zero if succeed
+ */
 int main(void) {
   int64_t number = 0;
   int64_t * primes = eratostenes_sieve(MAXPRIMES);
-  // int64_t sizePrimes = MAXPRIMES;
-  //double range = pow(2,63) - 1;
+
   while (scanf("%"SCNd64, &number) == 1) {
     if (number < 0 || number > 5) {
       printf("%"SCNd64, number);
-      /*if(number > primes[sizePrimes - 1]){
-        primes = eratostenes_sieve(number);
-      }*/
       int64_t * goldbach_sums = goldbach(&number, primes);
       printf("%s""%"SCNd64"%s", ": " , goldbach_sums[0], " sums");
+
       if (number < 0) {
         printf("%s", ": ");
         print_goldbach_sums(number, goldbach_sums);
@@ -43,17 +41,18 @@ int main(void) {
   free(primes);
   return EXIT_SUCCESS;
 }
-
+/**
+ * @brief Creates and returns an array of prime numbers 
+ * @details Uses the Eratostenes sieve to fill an array with prime numbers
+ * @param maxNum The highest amount of numbers that the array can contain
+ * @return a pointer to an array of prime numbers
+ */
 int64_t * eratostenes_sieve(int64_t maxNum) {
   int64_t * primes = calloc(MAXPRIMES, sizeof(int64_t));
-
   int64_t amountPrimes = 0;
   int64_t prime = 0;
   int64_t * nums = calloc(maxNum, sizeof(int64_t));
-  // int64_t nums[maxNum];
-  /*for(int i = 0; i < maxNum; i++){
-    nums[i] = 0;
-  }*/
+
   for (int index = 2; index < maxNum; index++) {
     if (nums[index] != 1 || index == 2) {
       primes[amountPrimes] = index;
@@ -70,6 +69,15 @@ int64_t * eratostenes_sieve(int64_t maxNum) {
   return primes;
 }
 
+/**
+ * @brief Returns an array with the amount of goldbach sums and/or 
+ * the goldbach sums
+ * @details Verifies if the number is even or odd, then calls
+ * a conjecture to create the array of goldbach sums
+ * @param number The number wich goldbach sums will be find
+ * @param primes The vector with the prime numbers
+ * @return Returns a pointer to an array of the goldbach sums of a number
+ */
 int64_t* goldbach(int64_t * number, int64_t * primes) {
   int64_t* goldbach;
 
@@ -82,7 +90,16 @@ int64_t* goldbach(int64_t * number, int64_t * primes) {
   return goldbach;
 }
 
-// Para pares
+/**
+ * @brief Returns an array with the amount of goldbach sums and/or 
+ * the goldbach sums
+ * @details The conjecture for even numbers, the first position of the array
+ * is the amount of goldbach sums of the number. the next positions are the
+ * numbers that conform the sums (they will be accessed in pairs to print)
+ * @param number The number wich goldbach sums will be find
+ * @param primes The vector with the prime numbers
+ * @return Returns a pointer to an array of the goldbach sums of a number
+ */
 int64_t* goldbach_strong_conjecture(int64_t number, int64_t * primes) {
   int64_t n = number / 2;
   int64_t amountSums = 0;
@@ -111,6 +128,16 @@ int64_t* goldbach_strong_conjecture(int64_t number, int64_t * primes) {
 
   return goldbachSums;
 }
+/**
+ * @brief Returns an array with the amount of goldbach sums and/or 
+ * the goldbach sums
+ * @details The conjecture for odd numbers, the first position of the array
+ * is the amount of goldbach sums of the number. the next positions are the
+ * numbers that conform the sums (they will be accessed int trios to print)
+ * @param number The number wich goldbach sums will be find
+ * @param primes The vector with the prime numbers
+ * @return Returns a pointer to an array of the goldbach sums of a number
+ */
 int64_t* goldbach_weak_conjecture(int64_t number, int64_t * primes) {
   int64_t n = number / 2;
   int64_t amountSums = 0;
@@ -142,9 +169,15 @@ int64_t* goldbach_weak_conjecture(int64_t number, int64_t * primes) {
 
   return goldbachSums;
 }
-
+/**
+ * @brief Prints the goldbach sums of a number
+ * @details counterMax and counter are used to access correctly to the sums
+ * depending on if the number is even (numbers have to be joined by pairs) or
+ * if it is odd (numbers have to be joned by trios)
+ * @param number The number wich goldbach sums will be find
+ * @param goldbachSums The array with the goldbach sums
+ */
 void print_goldbach_sums(int64_t number, int64_t * goldbachSums) {
-  // int64_t size = 10;
   int counter = 1;
   int counterMax = 3;
   int index = 1;  // First position of goldbachSums is the amount of sums
@@ -166,7 +199,11 @@ void print_goldbach_sums(int64_t number, int64_t * goldbachSums) {
     index++;
   }
 }
-
+/**
+ * @brief Returns if a number is even
+ * @details proves if a number is divisible by 2
+ * @param number The number
+ */
 bool is_even_number(int64_t number) {
   return number % 2 == 0;
 }
