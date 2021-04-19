@@ -1,5 +1,6 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 #include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -7,7 +8,7 @@
 
 
 #define MAXPRIMES 1000000
-#define MAXNUMBERS 100
+#define MAXNUMBERS 1000000
 
 int64_t * eratostenes_sieve(int64_t maxNum);
 int64_t* goldbach(int64_t * number, int64_t * primes);
@@ -20,9 +21,9 @@ int main(void) {
   int64_t number = 0;
   int64_t * primes = eratostenes_sieve(MAXPRIMES);
   // int64_t sizePrimes = MAXPRIMES;
-  printf("%"SCNd64"\n", sizeof(*primes));
+  //double range = pow(2,63) - 1;
   while (scanf("%"SCNd64, &number) == 1) {
-    if ((number > 5 || number < 0)) {
+    if (number < 0 || number > 5) {
       printf("%"SCNd64, number);
       /*if(number > primes[sizePrimes - 1]){
         primes = eratostenes_sieve(number);
