@@ -1,3 +1,4 @@
+// Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -52,11 +53,13 @@ int64_t * eratostenes_sieve(int64_t maxNum) {
   /*for(int i = 0; i < maxNum; i++){
     nums[i] = 0;
   }*/
-  for (int index = 2; index <= maxNum; index++) {
+  for (int index = 2; index < maxNum; index++) {
     if (nums[index] != 1 || index == 2) {
       primes[amountPrimes] = index;
       for (prime = 2; (prime * index) <= maxNum; prime++) {
-        nums[(prime * index)] = (int64_t)1;
+        if (prime * index < maxNum) {
+          nums[(prime * index)] = 1;
+        }
       }
       amountPrimes++;
     }
