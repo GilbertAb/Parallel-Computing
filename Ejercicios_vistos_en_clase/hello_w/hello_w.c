@@ -17,22 +17,27 @@ int main(int argc, char* argv[]) {
 	}
   }
 
-  pthread_t thread[thread_count];
-  for (size_t index = 0; index < thread_count; ++index) {
-    if (pthread_create(&thread[index], /*attr*/ NULL, run, (void*)index)
-        == EXIT_SUCCESS) {
-    } else {
-      fprintf(stderr, "could not create secundary thread\n");
-      return EXIT_FAILURE;
+  pthread_t* threads = (pthread_t*)malloc(thread_count * sizeof(pthread_t));
+  if (threads) {
+    for (size_t index = 0; index < thread_count; ++index) {
+      if (pthread_create(&threads[index], /*attr*/ NULL, run, (void*)index)
+          == EXIT_SUCCESS) {
+      } else {
+        fprintf(stderr, "could not create secundary thread\n");
+        return EXIT_FAILURE;
+      }
     }
-  }
   
-  printf("Hello from main thread\n");
+    printf("Hello from main thread\n");
   
-  for (size_t index = 0; index < thread_count; ++index) {
-    pthread_join(thread[index], /*value_ptr*/ NULL);
+    for (size_t index = 0; index < thread_count; ++index) {
+      pthread_join(threads[index], /*value_ptr*/ NULL);
+    }
+  } else {
+    fprintf(stderr, "Could not allocate memory for %zu threads\n"
+      , thread_count);
+    return EXIT_FAILURE;
   }
-
   return EXIT_SUCCESS;
 }
 
