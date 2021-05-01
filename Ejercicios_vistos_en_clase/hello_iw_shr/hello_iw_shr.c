@@ -30,7 +30,20 @@ int main(int argc, char* argv[]) {
         return EXIT_FAILURE;
   	  }
     }
+    
+    struct timespec start_time;
+    clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &start_time);
+    
     error = create_threads(shared_data);
+    
+    struct timespec finish_time;
+    clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &finish_time);
+    
+    double elapsed = (finish_time.tv_sec - start_time.tv_sec) +
+      (finish_time.tv_nsec - start_time.tv_nsec) * 1e-9;
+    
+    printf("Execution time: %.9lf\n", elapsed);
+    
     free(shared_data);
   }
   return error;
