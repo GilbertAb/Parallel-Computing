@@ -1,14 +1,17 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
-// Creates an arbitrary amount of threads that greet in stdout
+// Avoids race condition (concurrent modification of shared memory) by using
+// mutual exclusion (mutex, lock)
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+
 struct shared_data_t {
   size_t thread_count;
-  size_t position; 
+  size_t position;
+  pthread_mutex_t can_access_position;
 };
 
 struct private_data_t {
@@ -28,25 +31,32 @@ int main(int argc, char* argv[]) {
   if (shared_data) {
     shared_data->position = 0;
     shared_data->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
-    if (argc == 2 /*&& sscanf(argv[1], "%zu", &thread_count)*/){
-      if(sscanf(argv[1], "%zu", &shared_data->thread_count) != 1) {
-        fprintf(stderr,"error: invalid thread count");
-        return EXIT_FAILURE;
-  	  }
+    error = pthread_mutex_init( &shared_data->can_access_position, /*attr*/ NULL);
+    if (error == EXIT_SUCCESS) {
+      if (argc == 2 /*&& sscanf(argv[1], "%zu", &thread_count)*/){
+        if(sscanf(argv[1], "%zu", &shared_data->thread_count) != 1) {
+          fprintf(stderr,"error: invalid thread count");
+          error = 1;
+  	    }
+      }
+      
+      if (error == EXIT_SUCCESS) {
+        struct timespec start_time;
+        clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &start_time);
+    
+        error = create_threads(shared_data);
+    
+        struct timespec finish_time;
+        clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &finish_time);
+    
+        double elapsed = (finish_time.tv_sec - start_time.tv_sec) +
+          (finish_time.tv_nsec - start_time.tv_nsec) * 1e-9;
+        pthread_mutex_destroy(&shared_data->can_access_position);
+        printf("Execution time: %.9lf\n", elapsed);
+      }
+    } else { 
+      fprintf(stderr,"error: could not init mutex");
     }
-    
-    struct timespec start_time;
-    clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &start_time);
-    
-    error = create_threads(shared_data);
-    
-    struct timespec finish_time;
-    clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &finish_time);
-    
-    double elapsed = (finish_time.tv_sec - start_time.tv_sec) +
-      (finish_time.tv_nsec - start_time.tv_nsec) * 1e-9;
-    
-    printf("Execution time: %.9lf\n", elapsed);
     
     free(shared_data);
   }
@@ -90,11 +100,15 @@ int create_threads(struct shared_data_t* shared_data){
 
 void* run(void* data) {
   const struct private_data_t* private_data = (struct private_data_t*)data;
+  struct shared_data_t* shared_data = private_data->shared_data;
   const size_t my_thread_id = private_data->thread_number;
-  const size_t thread_count = private_data->shared_data->thread_count;
+  const size_t thread_count = shared_data->thread_count;
   
-  printf("Thread %zu/%zu: I arrived at position %zu\n", my_thread_id,
-         thread_count, ++private_data->shared_data->position);
+  pthread_mutex_lock(&shared_data->can_access_position);
+    size_t my_position = ++shared_data->position;
+    printf("Thread %zu/%zu: I arrived at position %zu\n", my_thread_id,
+         thread_count, my_position);
+  pthread_mutex_unlock(&shared_data->can_access_position);
 
   return NULL;
 }
