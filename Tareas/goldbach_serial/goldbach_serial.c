@@ -150,11 +150,11 @@ array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums, array_in
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
 array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes) {
-  int64_t n = number / 2;
+  int64_t half = number / 2;
 
   bool lastPrime_i = false;
 
-  for (int i = 0; array_int64_getElement(&primes, i) <= n && !lastPrime_i; i++) {
+  for (int i = 0; array_int64_getElement(&primes, i) <= half && !lastPrime_i; i++) {
     bool lastPrime_j = false;
     int64_t num1 = array_int64_getElement(&primes, i);
     if (num1 != 0) {
@@ -189,11 +189,11 @@ array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldb
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
 array_int64_t * goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes){
-  int64_t n = number / 2;
+  int64_t half = number / 2;
 
   bool lastPrime_i = false;
 
-  for (int i = 0; array_int64_getElement(&primes, i) <= n && !lastPrime_i; i++) {
+  for (int i = 0; array_int64_getElement(&primes, i) <= half && !lastPrime_i; i++) {
     bool lastPrime_j = false;
     int64_t num1 = array_int64_getElement(&primes, i);
     
