@@ -72,12 +72,11 @@ int main(void) {
       array_int64_destroy(&goldbach_sums);
     
     } else {
-      /*if (negativeInput) {
+      if (negativeInput) {
         printf("%"SCNd64 "%s", -number, ": NA\n");
       }else{
         printf("%"SCNd64 "%s", number, ": NA\n");
-      }*/
-      printf("%"SCNd64 "%s", number, ": NA\n");
+      }
     }
   }
   //free(primes);
