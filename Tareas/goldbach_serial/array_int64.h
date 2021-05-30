@@ -16,4 +16,5 @@ void array_int64_destroy(array_int64_t* array);
 int array_int64_append(array_int64_t* array, int64_t element);
 int64_t array_int64_getCount(array_int64_t* array);
 int64_t array_int64_getElement(array_int64_t* array, int64_t position);
+void array_int64_print(array_int64_t* array);///////////////////////////////
 #endif  // ARRAY_INT64

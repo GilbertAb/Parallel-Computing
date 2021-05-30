@@ -1,5 +1,8 @@
 #include <assert.h>
 #include <stdlib.h>
+#include <stdio.h>/////////////////////
+#include <stdint.h>////////////////////
+#include <inttypes.h>//////////////////
 
 #include "array_int64.h"
 
@@ -59,4 +62,12 @@ int64_t array_int64_getCount(array_int64_t* array) {
 
 int64_t array_int64_getElement(array_int64_t* array, int64_t position) {
   return array->elements[position];
+}
+
+void array_int64_print(array_int64_t* array){////////////////////////
+  printf("%s", "eratostenes: ");
+  for (int i = 0; i < array->count; i++){
+    printf("%"SCNd64"%s",array->elements[i], ",");
+  }
+  printf("%s","\n");
 }

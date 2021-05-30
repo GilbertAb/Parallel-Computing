@@ -26,21 +26,23 @@ bool is_even_number(int64_t number);
  */
 int main(void) {
   int64_t number = 0;
-  int64_t maxPrime = 0;//***********************
+  int64_t maxPrime = 10;//***********************
   int64_t amountGoldbachSums = 0;
   //int64_t * primes = eratostenes_sieve(MAXPRIMES);//
   //array_int64 primes = eratostenes_sieve();
   array_int64_t primes;
   array_int64_init(&primes);
-  primes = eratostenes_sieve(number);
+  primes = eratostenes_sieve(maxPrime);
+  array_int64_print(&primes);//////////////////////////////////////////
   while (scanf("%"SCNd64, &number) == 1) {
-    
     //********************************************************
-    if(number > maxPrime){
+    
+    if(number > maxPrime || number * (-1) > maxPrime){
+      //printf("%s", "redo primes \n");
       array_int64_destroy(&primes);
       array_int64_init(&primes);
       primes = eratostenes_sieve(number);
-      
+      array_int64_print(&primes);////////////////////////
       maxPrime = number;
     }
     //********************************************************
@@ -56,13 +58,12 @@ int main(void) {
       //*******************************************************************
       if (is_even_number(number)) {
         amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 2;
-        printf("%"SCNd64, amountGoldbachSums);
       } else {
         amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 3;
       }
       //******************************************************************
       
-      //prinarray_int64_ttf("%s""%"SCNd64"%s", ": " , goldbach_sums[0], " sums");
+      //printf("%s""%"SCNd64"%s", ": " , goldbach_sums[0], " sums");
       printf("%s""%"SCNd64"%s", ": " , amountGoldbachSums, " sums");
       if (number < 0) {
         printf("%s", ": ");
@@ -111,8 +112,7 @@ array_int64_t eratostenes_sieve(int64_t maxNum) {
       amountPrimes++;
     }
   }
-  //free(nums);
-  array_int64_destroy(&primes);
+  free(nums);
 
   return primes;
 }
@@ -252,7 +252,7 @@ void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
       printf("%s", " + ");
       ++counter;
     } else {
-      if (array_int64_getElement(goldbach_sums, index + 1) == array_int64_getCount(goldbach_sums)) {
+      if ((index + 1) != array_int64_getCount(goldbach_sums)) {
         printf("%s", ", ");
       }
       counter = 1;
