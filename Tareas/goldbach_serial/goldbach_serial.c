@@ -7,16 +7,9 @@
 
 #include "array_int64.h"
 
-/*#define MAXPRIMES 1000000
-#define MAXNUMBERS 1000000*/
-
-//int64_t * eratostenes_sieve(int64_t maxNum);
 array_int64_t eratostenes_sieve(int64_t maxNum);
-//int64_t* goldbach(int64_t * number, int64_t * primes);
 array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes);
-//int64_t* goldbach_strong_conjecture(int64_t number, int64_t * primes);
 array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes);
-//int64_t* goldbach_weak_conjecture(int64_t number, int64_t * primes);
 array_int64_t * goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes);
 void print_goldbach_sums(int64_t number, array_int64_t * goldbachSums);
 bool is_even_number(int64_t number);
@@ -26,19 +19,22 @@ bool is_even_number(int64_t number);
  */
 int main(void) {
   int64_t number = 0;
-  int64_t maxPrime = 10;//***********************
+  int64_t maxPrime = 5;//***********************
   int64_t amountGoldbachSums = 0;
-  //int64_t * primes = eratostenes_sieve(MAXPRIMES);//
-  //array_int64 primes = eratostenes_sieve();
+
   array_int64_t primes;
   array_int64_init(&primes);
   primes = eratostenes_sieve(maxPrime);
   array_int64_print(&primes);//////////////////////////////////////////
   while (scanf("%"SCNd64, &number) == 1) {
     //********************************************************
+    bool negativeInput = number < 0 ? true : false;
     
-    if(number > maxPrime || number * (-1) > maxPrime){
-      //printf("%s", "redo primes \n");
+    if(negativeInput){
+      number *= -1;
+    }
+
+    if(number > maxPrime){
       array_int64_destroy(&primes);
       array_int64_init(&primes);
       primes = eratostenes_sieve(number);
@@ -48,9 +44,11 @@ int main(void) {
     //********************************************************
     
     if (number < 0 || number > 5) {
-      printf("%"SCNd64, number);
-      
-      //int64_t * goldbach_sums = goldbach(&number, primes);
+      if (negativeInput) {
+        printf("%"SCNd64, -number);
+      }else{
+        printf("%"SCNd64, number);
+      }
       array_int64_t goldbach_sums;
       array_int64_init(&goldbach_sums);
       goldbach(number, &goldbach_sums, primes); //******************************
@@ -63,9 +61,8 @@ int main(void) {
       }
       //******************************************************************
       
-      //printf("%s""%"SCNd64"%s", ": " , goldbach_sums[0], " sums");
       printf("%s""%"SCNd64"%s", ": " , amountGoldbachSums, " sums");
-      if (number < 0) {
+      if (negativeInput){
         printf("%s", ": ");
         print_goldbach_sums(number, &goldbach_sums);
       }
@@ -75,6 +72,11 @@ int main(void) {
       array_int64_destroy(&goldbach_sums);
     
     } else {
+      /*if (negativeInput) {
+        printf("%"SCNd64 "%s", -number, ": NA\n");
+      }else{
+        printf("%"SCNd64 "%s", number, ": NA\n");
+      }*/
       printf("%"SCNd64 "%s", number, ": NA\n");
     }
   }
@@ -91,7 +93,6 @@ int main(void) {
  */
 //int64_t * eratostenes_sieve(int64_t maxNum) {
 array_int64_t eratostenes_sieve(int64_t maxNum) { 
-  //int64_t * primes = calloc(MAXPRIMES, sizeof(int64_t));
   
   array_int64_t primes;
   array_int64_init(&primes);
@@ -102,7 +103,6 @@ array_int64_t eratostenes_sieve(int64_t maxNum) {
 
   for (int64_t index = 2; index < maxNum; index++) {
     if (nums[index] != 1 || index == 2) {
-      //primes[amountPrimes] = index;
       array_int64_append(&primes, index);
       for (prime = 2; (prime * index) <= maxNum; prime++) {
         if (prime * index < maxNum) {
@@ -127,15 +127,12 @@ array_int64_t eratostenes_sieve(int64_t maxNum) {
  * @param primes The vector with the prime numbers
  * @return Rearray_int64_tturns a pointer to an array of the goldbach sums of a number
  */
-//int64_t* goldbach(int64_t * number, int64_t * primes) {
 array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes) {
-  //int64_t* goldbach;
   
   //****************************
   if (is_even_number(number)){
     goldbach_strong_conjecture(number, goldbach_sums, primes);
   } else {
-    //goldbach = goldbach_weak_conjecture(number, primes);
     goldbach_weak_conjecture(number, goldbach_sums, primes);
   }
 
@@ -152,37 +149,32 @@ array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums, array_in
  * @param primes The vector with the prime numbers
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
-//int64_t* goldbach_strong_conjecture(int64_t number, int64_t * primes) {
 array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes) {
   int64_t n = number / 2;
-  //int64_t amountSums = 0;
-  //int64_t countNumbers = 1;  // First pos of goldbachSums is the amount of sums
-  //int64_t * goldbachSums = calloc(MAXNUMBERS, sizeof(int64_t));
 
-  /*for (int i = 0; i < MAXNUMBERS; i++) {
-    goldbachSums[i] = 0;
-  }*/
+  bool lastPrime_i = false;
 
-  if (number < 0) {
-    number *= -1;
-    n *= -1;
-  }
+  for (int i = 0; array_int64_getElement(&primes, i) <= n && !lastPrime_i; i++) {
+    bool lastPrime_j = false;
+    int64_t num1 = array_int64_getElement(&primes, i);
+    if (num1 != 0) {
 
-  for (int i = 0; i < n; i++) {
-    for (int j = i; j < number; j++) {
-      //if (primes[i] + primes[j] == number) {
-      int64_t num1 = array_int64_getElement(&primes, i);
-      int64_t num2 = array_int64_getElement(&primes, j);
-      if(num1 + num2 == number){  
-        /*++amountSums;
-        goldbachSums[countNumbers++] = primes[i];
-        goldbachSums[countNumbers++] = primes[j];*/
-        array_int64_append(goldbach_sums, num1);
-        array_int64_append(goldbach_sums, num2);
+      for (int j = i; array_int64_getElement(&primes, j) <= number && !lastPrime_j; j++) {
+        //int64_t num1 = array_int64_getElement(&primes, i);
+        int64_t num2 = array_int64_getElement(&primes, j);
+        if(num2 != 0){
+          if(num1 + num2 == number /*&& num1 != 0 && num2 != 0*/){  
+            array_int64_append(goldbach_sums, num1);
+            array_int64_append(goldbach_sums, num2);
+          }
+        } else {
+          lastPrime_j = true;
+        }
       }
+    } else {
+      lastPrime_i = true;
     }
-  }
-  //goldbachSums[0] = amountSums;
+  }  
 
   return goldbach_sums;
 }
@@ -196,57 +188,55 @@ array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldb
  * @param primes The vector with the prime numbers
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
-//int64_t* goldbach_weak_conjecture(int64_t number, int64_t * primes) {
 array_int64_t * goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums, array_int64_t primes){
   int64_t n = number / 2;
-  //int64_t countNumbers = 1;  // First pos of goldbachSums is the amount of sums
-  //int64_t * goldbachSums = calloc(MAXNUMBERS, sizeof(int64_t));
 
-  /*for (int i = 0; i < MAXNUMBERS; i++) {
-    goldbachSums[i] = 0;
-  }*/
+  bool lastPrime_i = false;
 
-  if (number < 0) {
-    number *= -1;
-    n *= -1;
-  }
-
-  for (int i = 0; i < n; i++) {
-    for (int j = i; j < number; j++) {
-      for (int k = j; k < number; k++) {
-        int64_t num1 = array_int64_getElement(&primes, i);
+  for (int i = 0; array_int64_getElement(&primes, i) <= n && !lastPrime_i; i++) {
+    bool lastPrime_j = false;
+    int64_t num1 = array_int64_getElement(&primes, i);
+    
+    if (num1 != 0) {
+      for (int j = i; array_int64_getElement(&primes, j) <= number && !lastPrime_j; j++) {
+        bool lastPrime_k = false;
         int64_t num2 = array_int64_getElement(&primes, j);
-        int64_t num3 = array_int64_getElement(&primes, k);
-
-        if (num1 + num2 + num3 == number) {
-          /*++amountSums;
-          goldbachSums[countNumbers++] = primes[i];
-          goldbachSums[countNumbers++] = primes[j];
-          goldbachSums[countNumbers++] = primes[k];
-          */
-          array_int64_append(goldbach_sums, num1);
-          array_int64_append(goldbach_sums, num2);
-          array_int64_append(goldbach_sums, num3);
+      
+        if (num2 != 0) {
+          for (int k = j; array_int64_getElement(&primes, k) <= number && !lastPrime_k; k++) {
+            //int64_t num1 = array_int64_getElement(&primes, i);
+            //int64_t num2 = array_int64_getElement(&primes, j);
+            int64_t num3 = array_int64_getElement(&primes, k);
+            if (num3 != 0) {
+              if (num1 + num2 + num3 == number /*&& num1 != 0 && num2 != 0 && num3 != 0*/) {
+                array_int64_append(goldbach_sums, num1);
+                array_int64_append(goldbach_sums, num2);
+                array_int64_append(goldbach_sums, num3);
+              }
+            } else {
+              lastPrime_k = true;
+            }
+          }  
+        }   else {
+          lastPrime_j = true;
         }
       }
+    } else {
+      lastPrime_i = true;
     }
   }
-    //goldbachSums[0] = amountSums;
   return goldbach_sums;
 }
 void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
   int counter = 1;
   int counterMax = 3;
-  //int index = 1;  // First position of goldbachSums is the amount of sums
   int index = 0;
 
   if (is_even_number(number)) {
     counterMax = 2;
   }
 
-  //while (goldbachSums[index] != 0) {
   while (index < array_int64_getCount(goldbach_sums)) {
-    //printf("%"SCNd64, goldbachSums[index]);
     printf("%"SCNd64, array_int64_getElement(goldbach_sums, index));
     if (counter < counterMax) {
       printf("%s", " + ");
