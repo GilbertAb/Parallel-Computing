@@ -1,16 +1,23 @@
-APPNAME=goldbach_serial
-EXECUTABLES= $(APPNAME) $(APPNAME)_asan $(APPNAME)_msan
+APPNAME=goldbach_pthread
+EXECUTABLES= $(APPNAME) $(APPNAME)_asan $(APPNAME)_msan $(APPNAME)_tsan
+CC=cc
+CC2=clang
+CFLAGS=-g -Wall -Wextra
+LIBS=-pthread
 
 all: $(EXECUTABLES)
 
 $(APPNAME): $(APPNAME).c
-	cc -g -Wall -Wextra $(APPNAME).c array_int64.c -o $(APPNAME)
+	$(CC) $(CFLAGS) $(APPNAME).c array_int64.c -o $(APPNAME) $(LIBS)
 
 $(APPNAME)_asan: $(APPNAME).c
-	cc -g -Wall -Wextra -fsanitize=address $(APPNAME).c array_int64.c -o $(APPNAME)_asan
+	$(CC) $(CFLAGS) -fsanitize=address $(APPNAME).c array_int64.c -o $(APPNAME)_asan $(LIBS)
 
 $(APPNAME)_msan: $(APPNAME).c
-	clang -g -Wall -Wextra -fsanitize=memory $(APPNAME).c array_int64.c -o $(APPNAME)_msan
+	$(CC2) $(CFLAGS) -fsanitize=memory $(APPNAME).c array_int64.c -o $(APPNAME)_msan $(LIBS)
+
+$(APPNAME)_tsan: $(APPNAME).c
+	$(CC2) $(CFLAGS) -fsanitize=thread $(APPNAME).c array_int64.c -o $(APPNAME)_tsan $(LIBS)
 
 .PHONY: memcheck
 memcheck:

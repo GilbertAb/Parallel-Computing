@@ -1,5 +1,6 @@
-goldbach_serial
-goldbach_serial_asan
-goldbach_serial_msan
-latex
-html
+goldbach_pthread
+goldbach_pthread_asan
+goldbach_pthread_msan
+goldbach_pthread_tsan
+html/
+latex/
