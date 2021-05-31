@@ -73,13 +73,12 @@ int main(void) {
 }
 
 /**
- * @brief Returns an array with the amount of goldbach sums and/or 
- * the goldbach sums
+ * @brief Constructs an array with the goldbach sums
  * @details Verifies if the number is even or odd, then calls
  * a conjecture to create the array of goldbach sums
  * @param number The number wich goldbach sums will be find
  * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns a pointer to an array of the goldbach sums of a number
+ * @return Returns an integer to check errors
  */
 int goldbach(int64_t number, array_int64_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
@@ -94,14 +93,13 @@ int goldbach(int64_t number, array_int64_t * goldbach_sums) {
 }
 
 /**
- * @brief Returns an array with the amount of goldbach sums and/or 
- * the goldbach sums
+ * @brief Constructs an array with the goldbach sums
  * @details The conjecture for even numbers, the first position of the array
  * is the amount of goldbach sums of the number. the next positions are the
  * numbers that conform the sums (they will be accessed in pairs to print)
  * @param number The number wich goldbach sums will be find
  * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns a pointer to an array of the goldbach sums of a number
+ * @return Returns an integer to check errors
  */
 int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
@@ -127,14 +125,13 @@ int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
 }
 
 /**
- * @brief Returns an array with the amount of goldbach sums and/or 
- * the goldbach sums
+ * @brief Constructs an array with the goldbach sums
  * @details The conjecture for odd numbers, the first position of the array
  * is the amount of goldbach sums of the number. the next positions are the
  * numbers that conform the sums (they will be accessed int trios to print)
  * @param number The number wich goldbach sums will be find
  * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns a pointer to an array of the goldbach sums of a number
+ * @return Returns an integer to check errors
  */
 int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums){
   int error = EXIT_SUCCESS;
