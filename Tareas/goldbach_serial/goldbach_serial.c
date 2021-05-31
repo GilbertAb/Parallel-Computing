@@ -72,8 +72,8 @@ int main(void) {
  * @details Verifies if the number is even or odd, then calls
  * a conjecture to create the array of goldbach sums
  * @param number The number wich goldbach sums will be find
- * @param primes The vector with the prime numbers
- * @return Rearray_int64_tturns a pointer to an array of the goldbach sums of a number
+ * @param goldbach_sums pointer to the array with the goldbach sums
+ * @return Returns a pointer to an array of the goldbach sums of a number
  */
 array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums) {
   
@@ -93,7 +93,7 @@ array_int64_t * goldbach(int64_t number, array_int64_t * goldbach_sums) {
  * is the amount of goldbach sums of the number. the next positions are the
  * numbers that conform the sums (they will be accessed in pairs to print)
  * @param number The number wich goldbach sums will be find
- * @param primes The vector with the prime numbers
+ * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
 array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
@@ -119,7 +119,7 @@ array_int64_t * goldbach_strong_conjecture(int64_t number, array_int64_t * goldb
  * is the amount of goldbach sums of the number. the next positions are the
  * numbers that conform the sums (they will be accessed int trios to print)
  * @param number The number wich goldbach sums will be find
- * @param primes The vector with the prime numbers
+ * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns a pointer to an array of the goldbach sums of a number
  */
 array_int64_t * goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums){
@@ -142,6 +142,12 @@ array_int64_t * goldbach_weak_conjecture(int64_t number, array_int64_t * goldbac
   return goldbach_sums;
 }
 
+/**
+ * @brief Prints the goldbach sums of a number
+ * @details Prints the goldbach sums of a number
+ * @param number The number wich goldbach sums will be printed
+ * @param goldbach_sums pointer to the array with the goldbach sums
+ */
 void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
   int counter = 1;
   int counterMax = 3;
@@ -165,15 +171,24 @@ void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
     index++;
   }
 }
+
 /**
  * @brief Returns if a number is even
  * @details proves if a number is divisible by 2
  * @param number The number
+ * @return Returns true if a number is even
  */
 bool is_even_number(int64_t number) {
   return number % 2 == 0;
 }
 
+/**
+ * @brief Returns if a number is a prime number
+ * @details Determines if a number is a prime number by checking if it
+ * has more than two divisors
+ * @param number The number
+ * @return Returns true if a number is a prime number
+ */
 bool isPrime(int64_t number) {
   bool isPrime = true;
 
