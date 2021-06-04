@@ -5,18 +5,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "goldbach_pthread.h"
 #include "array_int64.h"
 
+/*
 int goldbach(int64_t number, array_int64_t * goldbach_sums);
 int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums);
 int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums);
-void print_goldbach_sums(int64_t number, array_int64_t * goldbachSums);
+void print_goldbach_sums(int64_t number, array_int64_t * goldbachSums);*/
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
 
 /**
  * @return zero if succeed
  */
+
+int goldbach_pthread_create() {
+
+  return EXIT_SUCCESS;
+}
+int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* argv[]) {
+  return EXIT_SUCCESS;
+}
+/*
 int main(void) {
   int64_t error = EXIT_SUCCESS;
   int64_t number = 0;
@@ -70,7 +81,7 @@ int main(void) {
   }
 
   return error;
-}
+}*/
 
 /**
  * @brief Constructs an array with the goldbach sums
@@ -80,13 +91,13 @@ int main(void) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach(int64_t number, array_int64_t * goldbach_sums) {
+int goldbach_pthread_calculate_goldbach(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
 
   if (is_even_number(number)) {
-    error = goldbach_strong_conjecture(number, goldbach_sums);
+    error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, goldbach_sums);
   } else {
-    error = goldbach_weak_conjecture(number, goldbach_sums);
+    error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, goldbach_sums);
   }
 
   return error;
@@ -101,7 +112,7 @@ int goldbach(int64_t number, array_int64_t * goldbach_sums) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
+int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -133,7 +144,7 @@ int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums) {
+int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -164,13 +175,19 @@ int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums) {
   return error;
 }
 
+int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, char* argv[]){
+
+  return EXIT_SUCCESS;
+}
+
+
 /**
  * @brief Prints the goldbach sums of a number
  * @details Prints the goldbach sums of a number
  * @param number The number wich goldbach sums will be printed
  * @param goldbach_sums pointer to the array with the goldbach sums
  */
-void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
+void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbach_sums) {
   int counter = 1;
   int counterMax = 3;
   int index = 0;
@@ -221,4 +238,8 @@ bool isPrime(int64_t number) {
   }
 
   return isPrime;
+}
+
+int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
+  return EXIT_SUCCESS;
 }
