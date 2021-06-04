@@ -1,0 +1,36 @@
+main(argc, argv[]):
+  goldbach_pthread_t* goldbach_pthread  
+  if goldbach_pthread then
+    goldbach_pthread_create()
+    goldbach_pthread_run(goldbach_pthread, argc,argv)
+  end if
+
+///////////////////////////////////////////////////////////////
+//___________________goldbach_pthread________________________//
+//////////////////////////////////////////////////////////////
+
+goldbach_pthread_run(goldbach_pthread, argc, argv[]):
+  if argc == 2 then
+    shared thread_count := argv[1]
+  else
+    shared thread_count := sysconf(NProcessors)
+  end if
+
+  shared goldbach_sums := goldbach_pthread_create_matrix(thread_count,
+     n_sums, element_size)
+
+  goldbach_pthread_create_threads(shared_data, argv)
+
+  goldbach_pthread_print_goldbach_sums(shared_data)
+
+
+goldbach_pthread_create_threads(shared_data, argv[]):
+  for index := 1 to thread_count do
+    // calculate_goldbach = heavy_task, index = num to calculate
+    create_thread(thread[index], calculate_goldbach, index)
+  end for
+
+  for index := 1 to thread_count do
+    join(thread[index])
+  end for
+
