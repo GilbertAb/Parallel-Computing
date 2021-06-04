@@ -8,16 +8,16 @@ LIBS=-pthread
 all: $(EXECUTABLES)
 
 $(APPNAME): $(APPNAME).c
-	$(CC) $(CFLAGS) $(APPNAME).c array_int64.c -o $(APPNAME) $(LIBS)
+	$(CC) $(CFLAGS) main.c $(APPNAME).c array_int64.c -o $(APPNAME) $(LIBS)
 
 $(APPNAME)_asan: $(APPNAME).c
-	$(CC) $(CFLAGS) -fsanitize=address $(APPNAME).c array_int64.c -o $(APPNAME)_asan $(LIBS)
+	$(CC) $(CFLAGS) -fsanitize=address main.c $(APPNAME).c array_int64.c -o $(APPNAME)_asan $(LIBS)
 
 $(APPNAME)_msan: $(APPNAME).c
-	$(CC2) $(CFLAGS) -fsanitize=memory $(APPNAME).c array_int64.c -o $(APPNAME)_msan $(LIBS)
+	$(CC2) $(CFLAGS) -fsanitize=memory main.c $(APPNAME).c array_int64.c -o $(APPNAME)_msan $(LIBS)
 
 $(APPNAME)_tsan: $(APPNAME).c
-	$(CC2) $(CFLAGS) -fsanitize=thread $(APPNAME).c array_int64.c -o $(APPNAME)_tsan $(LIBS)
+	$(CC2) $(CFLAGS) -fsanitize=thread main.c $(APPNAME).c array_int64.c -o $(APPNAME)_tsan $(LIBS)
 
 .PHONY: memcheck
 memcheck:
