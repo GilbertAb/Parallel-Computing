@@ -1,87 +1,83 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+#include <assert.h>
+#include <errno.h>
 #include <inttypes.h>
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+
 
 #include "goldbach_pthread.h"
 #include "array_int64.h"
 
-/*
-int goldbach(int64_t number, array_int64_t * goldbach_sums);
-int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums);
-int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums);
-void print_goldbach_sums(int64_t number, array_int64_t * goldbachSums);*/
+#define NUMCOL 10
+
+void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size);
+void free_matrix(const int64_t row_count, void** matrix);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
 
 /**
  * @return zero if succeed
  */
-
-int goldbach_pthread_create() {
-
-  return EXIT_SUCCESS;
+goldbach_pthread_t* goldbach_pthread_create() {
+  goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
+    calloc(1, sizeof(goldbach_pthread_t));
+  
+  return goldbach_pthread;
 }
+
 int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* argv[]) {
+  int error = EXIT_SUCCESS;
+  
+  shared_data_t* shared_data = (shared_data_t*)
+    calloc(1, sizeof(shared_data_t));
+  
+  shared_data->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
+
+  if (shared_data) {
+    if(argc == 2){
+      if (sscanf(argv[1], "%zu", &shared_data->thread_count) != 1 || errno) {
+        fprintf(stderr, "error: invalid thread count\n");
+        error = 1;
+      }
+    }
+    printf("%zu", shared_data->thread_count);
+    if (error == EXIT_SUCCESS) {
+      shared_data->goldbach_sums = (struct array_int64*) create_matrix(shared_data->thread_count
+        , NUMCOL, sizeof(struct array_int64));
+    }
+    
+    goldbach_pthread_create_threads(goldbach_pthread, shared_data, argv);
+
+  }
+  
+  
   return EXIT_SUCCESS;
 }
-/*
-int main(void) {
-  int64_t error = EXIT_SUCCESS;
-  int64_t number = 0;
-  int64_t amountGoldbachSums = 0;
 
-  while (scanf("%"SCNd64, &number) == 1) {
-    bool negativeInput = number < 0 ? true : false;
+int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, shared_data_t* shared_data, char* argv[]){
+  assert(shared_data);
+  int error = EXIT_SUCCESS;
+  
+  pthread_t* threads = (pthread_t*) calloc(shared_data->thread_count
+    , sizeof(pthread_t));
+  private_data_t* private_data = (private_data_t*)
+    calloc(shared_data->thread_count, sizeof(private_data_t));
 
-    if (negativeInput) {
-      number *= -1;
-    }
-
-    if (number < 0 || number > 5) {
-      if (negativeInput) {
-        printf("%"SCNd64, -number);
-      } else {
-        printf("%"SCNd64, number);
-      }
-      array_int64_t goldbach_sums;
-      error = array_int64_init(&goldbach_sums);
-      if (error == EXIT_SUCCESS) {
-        error = goldbach(number, &goldbach_sums);
-        if (error == EXIT_SUCCESS) {
-          if (is_even_number(number)) {
-            amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 2;
-          } else {
-            amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 3;
-          }
-
-          printf("%s""%"SCNd64"%s", ": " , amountGoldbachSums, " sums");
-          if (negativeInput) {
-            printf("%s", ": ");
-            print_goldbach_sums(number, &goldbach_sums);
-          }
-          printf("%s", "\n");
-
-          array_int64_destroy(&goldbach_sums);
-        } else {
-          fprintf(stderr, "error: could not calculate goldbach sums\n");
-        }
-      } else {
-        fprintf(stderr, "error: could not init goldbach_sums.\n");
-      }
-    } else {
-      if (negativeInput) {
-        printf("%"SCNd64 "%s", -number, ": NA\n");
-      } else {
-        printf("%"SCNd64 "%s", number, ": NA\n");
-      }
+  if (threads && private_data) {
+    for (size_t index = 0; index < shared_data->thread_count; ++index) {
+      private_data[index].thread_number = index;
+      private_data[index].shared_data = shared_data;
+    //////////////////continue
+      
     }
   }
-
   return error;
-}*/
+}
 
 /**
  * @brief Constructs an array with the goldbach sums
@@ -175,12 +171,6 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
   return error;
 }
 
-int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, char* argv[]){
-
-  return EXIT_SUCCESS;
-}
-
-
 /**
  * @brief Prints the goldbach sums of a number
  * @details Prints the goldbach sums of a number
@@ -242,4 +232,31 @@ bool isPrime(int64_t number) {
 
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
   return EXIT_SUCCESS;
+}
+
+
+void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size) {
+  void** matrix = (void**) calloc(row_count, sizeof(void*));
+  if ( matrix == NULL ) {
+    return NULL;
+  }
+
+  for (int64_t row = 0; row < row_count; ++row) {
+    if ( (matrix[row] = calloc(col_count, element_size) ) == NULL ) {
+      free_matrix(row_count, matrix);
+      return NULL;
+    }
+  }
+
+  return matrix;
+}
+
+void free_matrix(const int64_t row_count, void** matrix) {
+  if (matrix) {
+    for (int64_t row = 0; row < row_count; ++row) {
+      free(matrix[row]);
+    }
+  }
+
+  free(matrix);
 }
