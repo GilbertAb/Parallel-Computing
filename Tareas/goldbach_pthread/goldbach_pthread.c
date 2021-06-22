@@ -19,14 +19,17 @@ void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size)
 void free_matrix(const int64_t row_count, void** matrix);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
-
+int create_numbers_array(array_int64_t* numbers,char* argv[]);
+int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
+int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
 /**
  * @return zero if succeed
  */
 goldbach_pthread_t* goldbach_pthread_create() {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
     calloc(1, sizeof(goldbach_pthread_t));
-  
+  array_int64_init(&goldbach_pthread->numbers);
+
   return goldbach_pthread;
 }
 
@@ -51,15 +54,17 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
         , NUMCOL, sizeof(struct array_int64));
     }
     
-    goldbach_pthread_create_threads(goldbach_pthread, shared_data, argv);
+    create_numbers_array(&goldbach_pthread->numbers, argv);
+    
+    
+    goldbach_pthread_create_threads(goldbach_pthread, shared_data);
 
   }
-  
   
   return EXIT_SUCCESS;
 }
 
-int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, shared_data_t* shared_data, char* argv[]){
+int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, shared_data_t* shared_data){
   assert(shared_data);
   int error = EXIT_SUCCESS;
   
@@ -69,11 +74,29 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread, shared
     calloc(shared_data->thread_count, sizeof(private_data_t));
 
   if (threads && private_data) {
-    for (size_t index = 0; index < shared_data->thread_count; ++index) {
+    int64_t amount_arguments = array_int64_getCount(&goldbach_pthread->numbers);
+    int64_t amount_threads = shared_data->thread_count;
+
+    if (amount_arguments < amount_threads) {
+      amount_threads = amount_arguments;
+    }
+
+    int64_t start_index = 1;
+    
+    for (int64_t index = 0; index < shared_data->thread_count; ++index) {
       private_data[index].thread_number = index;
       private_data[index].shared_data = shared_data;
-    //////////////////continue
       
+      if (pthread_create(&threads[index], /*attr*/ NULL, 
+        goldbach_pthread_calculate_goldbach, &private_data[index]) ==
+        EXIT_SUCCESS) {
+      } else {
+          fprintf(stderr, "error: could not create thread %zu\n", index);
+          error = 21;
+          shared_data->thread_count = index;
+          break;
+        }
+
     }
   }
   return error;
@@ -259,4 +282,25 @@ void free_matrix(const int64_t row_count, void** matrix) {
   }
 
   free(matrix);
+}
+
+int create_numbers_array(array_int64_t* numbers,char* argv[]) {
+  int error = EXIT_SUCCESS;
+  int64_t number = 0;
+  
+  while (scanf("%"SCNd64, &number) == 1) {
+    error = array_int64_append(numbers, number);
+  }
+
+  return error;
+}
+
+int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t thread_count) {
+  int64_t mod = total_numbers % thread_count;
+  int64_t min = thread_number < mod ? thread_number : mod;
+  return thread_number * (total_numbers / thread_count) + min;
+}
+
+int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t thread_count) {
+  block_mapping_start(thread_number + 1, total_numbers, thread_count);
 }
