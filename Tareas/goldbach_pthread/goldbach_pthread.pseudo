@@ -32,9 +32,9 @@ goldbach_pthread_create_threads(shared_data, numbers):
   if amount_numbers < thread_count
     amount_threads := amount_numbers
   
-  start_index := 1
-  last_index := amount_numbers / amount_threads
   for index := 1 to amount_threads do
+    start_index := block_mapping_start(index, numbers.getCount(), amount_threads)
+    last_index := block_mapping_last(index, numbers.getCount(), amount_threads)
     // calculate_goldbach = heavy_task
     create_thread(thread[index], calculate_goldbach, shared_data, start_index, last_index, numbers)
     start_index := start_index + last_index
