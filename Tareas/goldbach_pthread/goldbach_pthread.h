@@ -7,8 +7,8 @@
 // Shared_data
 typedef struct goldbach_pthread{
   int64_t thread_count;
-  array_int64_t numbers;
-  struct array_int64* goldbach_sums;
+  array_int64_t* numbers;
+  array_int64_t* goldbach_sums;
 } goldbach_pthread_t;
 
 typedef struct  {
@@ -19,12 +19,12 @@ typedef struct  {
   goldbach_pthread_t* goldbach_pthread;
 } private_data_t;
 
-goldbach_pthread_t* goldbach_pthread_create();
+goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers);
 int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* argv[]);
 void* goldbach_pthread_calculate_goldbach(void* data);
 int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number);
 int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number);
 int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread);
-void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbachSums);
+void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number/*, array_int64_t * goldbachSums*/);
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread);
 #endif  // GOLDBACH_PTHREAD

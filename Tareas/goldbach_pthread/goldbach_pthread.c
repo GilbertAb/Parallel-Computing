@@ -19,17 +19,19 @@ void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size)
 void free_matrix(const int64_t row_count, void** matrix);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
-int create_numbers_array(array_int64_t* numbers,char* argv[]);
 int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
 int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
 /**
  * @return zero if succeed
  */
-goldbach_pthread_t* goldbach_pthread_create() {
+goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
     calloc(1, sizeof(goldbach_pthread_t));
-  array_int64_init(&goldbach_pthread->numbers);
-
+  
+  goldbach_pthread->numbers = numbers;
+  for (int i = 0; i < 11; i++) {
+    printf("%s""%"SCNd64, "\n",array_int64_getElement(goldbach_pthread->numbers,i));
+  }
   return goldbach_pthread;
 }
 
@@ -37,7 +39,7 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
   int error = EXIT_SUCCESS;
   
   goldbach_pthread->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
-
+  printf("%zu", goldbach_pthread->thread_count);
   if (goldbach_pthread) {
     if(argc == 2){
       if (sscanf(argv[1], "%zu", &goldbach_pthread->thread_count) != 1 || errno) {
@@ -47,11 +49,9 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
     }
     printf("%zu", goldbach_pthread->thread_count);
     if (error == EXIT_SUCCESS) {
-      goldbach_pthread->goldbach_sums = (struct array_int64*) create_matrix(goldbach_pthread->thread_count
+      goldbach_pthread->goldbach_sums = (array_int64_t*) create_matrix(goldbach_pthread->thread_count
         , NUMCOL, sizeof(struct array_int64));
-    }
-    
-    create_numbers_array(&goldbach_pthread->numbers, argv);
+    }    
     goldbach_pthread_create_threads(goldbach_pthread);
 
   }
@@ -68,7 +68,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
     calloc(goldbach_pthread->thread_count, sizeof(private_data_t));
 
   if (threads && private_data) {
-    int64_t amount_numbers = array_int64_getCount(&goldbach_pthread->numbers);
+    int64_t amount_numbers = array_int64_getCount(goldbach_pthread->numbers);
     int64_t amount_threads = goldbach_pthread->thread_count;
 
     if (amount_numbers < amount_threads) {
@@ -94,6 +94,19 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
           break;
         }
     }
+    
+    printf("Hello from main thread\n");
+
+    for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
+      pthread_join(threads[index], /*value_ptr*/ NULL);
+    }
+
+    free(threads);
+    free(private_data);
+  } else {
+    fprintf(stderr, "Could not allocate memory for %zu threads\n"
+      , goldbach_pthread->thread_count);
+    error = 22;
   }
   return error;
 }
@@ -107,12 +120,13 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
  */
 void* goldbach_pthread_calculate_goldbach(void* data) {
   int error = EXIT_SUCCESS;
+  error++;
   const private_data_t* private_data = (private_data_t*)data;
   int64_t thread_number = private_data->thread_number;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
 
   for (int index = private_data->start_index; index < private_data->finish_index; index++) {
-    int64_t number = array_int64_getElement(&goldbach_pthread->numbers,index);    
+    int64_t number = array_int64_getElement(goldbach_pthread->numbers,index);    
     if (is_even_number(number)) {
       error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, thread_number);
     } else {
@@ -200,7 +214,7 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
  * @param number The number wich goldbach sums will be printed
  * @param goldbach_sums pointer to the array with the goldbach sums
  */
-void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number, array_int64_t * goldbach_sums) {
+void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number/*, array_int64_t * goldbach_sums*/) {
   int counter = 1;
   int counterMax = 3;
   int index = 0;
@@ -209,13 +223,13 @@ void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number, a
     counterMax = 2;
   }
 
-  while (index < array_int64_getCount(goldbach_sums)) {
-    printf("%"SCNd64, array_int64_getElement(goldbach_sums, index));
+  while (index < array_int64_getCount(goldbach_pthread->goldbach_sums)) {
+    printf("%"SCNd64, array_int64_getElement(goldbach_pthread->goldbach_sums, index));
     if (counter < counterMax) {
       printf("%s", " + ");
       ++counter;
     } else {
-      if ((index + 1) != array_int64_getCount(goldbach_sums)) {
+      if ((index + 1) != array_int64_getCount(goldbach_pthread->goldbach_sums)) {
         printf("%s", ", ");
       }
       counter = 1;
@@ -254,7 +268,7 @@ bool isPrime(int64_t number) {
 }
 
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
-  
+  free(goldbach_pthread);
   return EXIT_SUCCESS;
 }
 
@@ -283,17 +297,6 @@ void free_matrix(const int64_t row_count, void** matrix) {
   }
 
   free(matrix);
-}
-
-int create_numbers_array(array_int64_t* numbers,char* argv[]) {
-  int error = EXIT_SUCCESS;
-  int64_t number = 0;
-  
-  while (scanf("%"SCNd64, &number) == 1) {
-    error = array_int64_append(numbers, number);
-  }
-
-  return error;
 }
 
 int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t thread_count) {
