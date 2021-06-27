@@ -50,8 +50,8 @@ void goldbach_sums_array_destroy(goldbach_sums_array_t* array) {
 int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element) {
   assert(array);
   if (element < 0) {
-      element *= -1;
-      array->is_negative_number = true;
+    element *= -1;
+    array->is_negative_number = true;
   }
   if (array->count == array->capacity) {
     if (goldbach_sums_array_increase_capacity(array) != EXIT_SUCCESS) {
@@ -111,7 +111,7 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
       get_amount_sums(array), " sums");
   
     } else {
-      printf("%s" "%"SCNd64 "%s" "%"SCNd64 "%s", "-", array->number,
+      printf(/*"%s"*/ "%"SCNd64 "%s" "%"SCNd64 "%s", /*"-",*/ array->number,
         ": " , get_amount_sums(array), " sums: ");
     
       if (array->number % 2 == 0) {
@@ -131,11 +131,12 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
       }
     }
   } else {
-    if (array->is_negative_number) {
+    printf("%"SCNd64 "%s", array->number, ": NA");
+    /*if (array->is_negative_number) {
         printf("%"SCNd64 "%s", -array->number, ": NA");
       } else {
         printf("%"SCNd64 "%s", array->number, ": NA");
-      }
+      }*/
   }  
   printf("%s", "\n");
 }
