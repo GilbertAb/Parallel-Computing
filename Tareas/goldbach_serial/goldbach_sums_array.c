@@ -1,10 +1,10 @@
-#include <assert.h>
-#include <stdlib.h>
+
 
 #include "goldbach_sums_array.h"
 
 
 int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array);
+void print_sum(goldbach_sums_array_t* array, int64_t amount_addends);
 
 /**
  * @brief initialize the goldbach_sums_array struct
@@ -84,4 +84,37 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array) {
 
 void goldbach_sums_array_print(goldbach_sums_array_t* array) {
   // TODO: print goldbach sums
+  if (array->is_negative_number) {
+    printf("-");
+  }
+  // TODO: method get_amount_sums
+  /*printf("%"SCNd64 "%s" "%"SCNd64 "%s", array->number, ": " ,
+    amount_sums(array), " sums: ");*/
+  
+  if (array->number % 2 == 0) {
+    for (int index = 0; index < array->count; index += 2){ 
+      print_sum(array, 2);
+      if (index + 2 < array->count) {
+        printf(", ");
+      }
+      
+    }
+  } else {
+    for (int index = 0; index < array->count; index += 3){
+      print_sum(array, 3);
+      if (index + 3 < array->count) {
+        printf(", ");
+      }
+      
+    }
+  }
+}
+
+void print_sum(goldbach_sums_array_t* array, int64_t amount_addends) {
+  for (int index = 0; index < amount_addends; index++) {
+    printf("%"SCNd64, array->elements[index]);
+    if (index + 1 <= amount_addends) {
+      printf("%s", " + ");
+    }
+  }
 }

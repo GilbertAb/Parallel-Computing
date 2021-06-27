@@ -1,8 +1,13 @@
 #ifndef GOLDBACH_SUMS_ARRAY
 #define GOLDBACH_SUMS_ARRAY
 
+#include <assert.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct goldbach_sums_array{
   int64_t capacity;
