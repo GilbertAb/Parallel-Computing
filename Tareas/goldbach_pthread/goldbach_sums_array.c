@@ -49,6 +49,10 @@ void goldbach_sums_array_destroy(goldbach_sums_array_t* array) {
  */
 int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element) {
   assert(array);
+  if (element < 0) {
+      element *= -1;
+      array->is_negative_number = true;
+  }
   if (array->count == array->capacity) {
     if (goldbach_sums_array_increase_capacity(array) != EXIT_SUCCESS) {
       return EXIT_FAILURE;
@@ -101,30 +105,38 @@ int64_t get_amount_sums(goldbach_sums_array_t* array) {
  * @param array pointer to the array.
  */
 void goldbach_sums_array_print(goldbach_sums_array_t* array) {
-  if (!array->is_negative_number) {
-    printf("%"SCNd64 "%s" "%"SCNd64 "%s", array->number, ": " ,
-    get_amount_sums(array), " sums");
+  if (array->number < 0 || array->number > 5 ) {
+    if (!array->is_negative_number) {
+      printf("%"SCNd64 "%s" "%"SCNd64 "%s", array->number, ": " ,
+      get_amount_sums(array), " sums");
   
-  } else {
-    printf("%s" "%"SCNd64 "%s" "%"SCNd64 "%s", "-", array->number,
-     ": " , get_amount_sums(array), " sums: ");
-    
-    if (array->number % 2 == 0) {
-      for (int index = 0; index < array->count; index += 2){ 
-        print_sum(array, index, 2);
-        if (index + 2 < array->count) {
-          printf(", ");
-        }
-      }
     } else {
-      for (int index = 0; index < array->count; index += 3){
-        print_sum(array, index, 3);
-        if (index + 3 < array->count) {
-          printf(", ");
+      printf("%s" "%"SCNd64 "%s" "%"SCNd64 "%s", "-", array->number,
+        ": " , get_amount_sums(array), " sums: ");
+    
+      if (array->number % 2 == 0) {
+        for (int index = 0; index < array->count; index += 2){ 
+          print_sum(array, index, 2);
+          if (index + 2 < array->count) {
+            printf(", ");
+          }
+        }
+      } else {
+        for (int index = 0; index < array->count; index += 3){
+          print_sum(array, index, 3);
+          if (index + 3 < array->count) {
+            printf(", ");
+          }
         }
       }
     }
-  }
+  } else {
+    if (array->is_negative_number) {
+        printf("%"SCNd64 "%s", -array->number, ": NA");
+      } else {
+        printf("%"SCNd64 "%s", array->number, ": NA");
+      }
+  }  
   printf("%s", "\n");
 }
 

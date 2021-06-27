@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdlib.h>
-#include <inttypes.h>//////////////////
 
 #include "array_int64.h"
 

@@ -47,7 +47,6 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
       }
     }
     if (error == EXIT_SUCCESS) {
-      printf("%s", "Here");
       goldbach_pthread->goldbach_sums = create_goldbach_sums_matrix(goldbach_pthread->numbers);
     }    
     goldbach_pthread_create_threads(goldbach_pthread);
@@ -81,7 +80,9 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
       private_data[index].finish_index = block_mapping_finish(
         private_data[index].thread_number, amount_numbers, amount_threads);
       
-      // TODO: pthread_create's routine should have only 1 attribute
+      printf("%s" "%"SCNd64"%s" "%"SCNd64 "%s", "start_index: ", private_data[index].start_index,
+        ", finish_index: ", private_data[index].finish_index, "\n");
+
       if (pthread_create(&threads[index], /*attr*/NULL, 
         goldbach_pthread_calculate_goldbach, &private_data[index]
         ) == EXIT_SUCCESS) {
@@ -128,21 +129,20 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
 
   for (int index = private_data->start_index; index < private_data->finish_index; index++) {
-    int64_t number = array_int64_getElement(goldbach_pthread->numbers,index);    
-    
+    int64_t number = array_int64_getElement(goldbach_pthread->numbers,index);
+    printf("%"SCNd64 "%s", number, "\n");
+    if (number < 0) {
+      number *= -1;
+    }
+
     if (number < 0 || number > 5) {
       if (is_even_number(number)) {
         error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, thread_number);
       } else {
         error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, thread_number);
       }
-    } else {
-      /*if (goldbach_pthread) {
-        printf("%"SCNd64 "%s", -number, ": NA\n");
-      } else {
-        printf("%"SCNd64 "%s", number, ": NA\n");
-      }*/
     }
+  }  
   return NULL;
 }
 
@@ -265,7 +265,7 @@ int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
 }
 
 goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
-  printf("%s", "Create matrix");
+  printf("%s", "Create matrix\n");
   goldbach_sums_array_t** matrix = (goldbach_sums_array_t**) 
     calloc((size_t)array_int64_getCount(numbers), sizeof(goldbach_sums_array_t));
   if (matrix == NULL) {
