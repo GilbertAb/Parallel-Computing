@@ -7,10 +7,13 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array);
 void print_sum(goldbach_sums_array_t* array, int64_t index_array, int64_t amount_addends);
 
 /**
- * @brief initialize the goldbach_sums_array struct
- * @details initialize the goldbach_sums_array struct
- * @param array pointer to the array to be initialized
- * @return returns an integer to check errors
+ * @brief initialize the goldbach_sums_array struct.
+ * @details initialize the goldbach_sums_array struct.
+ * @param array pointer to the array to be initialized.
+ * @param number number which goldbach sums will be calculated.
+ * @param is_negative_number bool to know if the user input of this number was 
+ * negative or positive.
+ * @return returns an integer to check errors.
  */
 int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number,
   bool is_negative_number) {
@@ -23,10 +26,10 @@ int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number,
   return EXIT_SUCCESS;
 }
 /**
- * @brief destroys the goldbach_sums_array struct
- * @details initialize the goldbach_sums_array struct
- * @param array pointer to the array to be destroyed
- * @return returns an integer to check errors
+ * @brief destroys the goldbach_sums_array struct.
+ * @details initialize the goldbach_sums_array struct.
+ * @param array pointer to the array to be destroyed.
+ * @return returns an integer to check errors.
  */
 void goldbach_sums_array_destroy(goldbach_sums_array_t* array) {
   assert(array);
@@ -38,11 +41,11 @@ void goldbach_sums_array_destroy(goldbach_sums_array_t* array) {
 }
 
 /**
- * @brief appends an element to the goldbach_sums_array struct
- * @details appends an element to the goldbach_sums_array struct
- * @param array pointer to the array
- * @param element element to be Appended
- * @return returns an integer to check errors
+ * @brief appends an element to the goldbach_sums_array struct.
+ * @details appends an element to the goldbach_sums_array struct.
+ * @param array pointer to the array.
+ * @param element element to be Appended.
+ * @return returns an integer to check errors.
  */
 int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element) {
   assert(array);
@@ -55,11 +58,11 @@ int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element) {
   return EXIT_SUCCESS;
 }
 /**
- * @brief increases the capacity of the goldbach_sums_array struct
+ * @brief increases the capacity of the goldbach_sums_array struct.
  * @details increases the capacity of the goldbach_sums_array struct by making it
- * 10 times bigger
- * @param array pointer to the array
- * @return returns an integer to check errors
+ * 10 times bigger.
+ * @param array pointer to the array.
+ * @return returns an integer to check errors.
  */
 int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array) {
   int64_t new_capacity = 10 * (array->capacity ? array->capacity : 1);
@@ -76,10 +79,10 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array) {
 }
 
 /**
- * @brief returns the count of elements in the array
- * @details returns the count of elements in the array
- * @param array pointer to the array
- * @return returns the count of elements in the array
+ * @brief returns the amount of sums in the array.
+ * @details returns the amount of sums in the array.
+ * @param array pointer to the array.
+ * @return the amount of sums in the array.
  */
 int64_t get_amount_sums(goldbach_sums_array_t* array) {
   int64_t amount_sums = 0;
@@ -92,7 +95,11 @@ int64_t get_amount_sums(goldbach_sums_array_t* array) {
   return amount_sums;
 }
 
-
+/**
+ * @brief prints the number and/or its goldbach sums.
+ * @details prints the number and/or its goldbach sums.
+ * @param array pointer to the array.
+ */
 void goldbach_sums_array_print(goldbach_sums_array_t* array) {
   if (!array->is_negative_number) {
     printf("%"SCNd64 "%s" "%"SCNd64 "%s", array->number, ": " ,
@@ -121,7 +128,16 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
   printf("%s", "\n");
 }
 
-void print_sum(goldbach_sums_array_t* array,int64_t index_array, int64_t amount_addends) {
+/**
+ * @brief prints one sum of the number.
+ * @details checks if the addends should be 2 or 3, then prints one 
+ * sum of the number.
+ * @param array pointer to the array.
+ * @param index_array index of the array were the sum starts.
+ * @param amount_addends amount of addends that the sum has.
+ */
+void print_sum(goldbach_sums_array_t* array,int64_t index_array, 
+  int64_t amount_addends) {
   for (int64_t index = 0; index < amount_addends; index++) {
     printf("%"SCNd64, array->elements[index_array++]);
     if (index + 1 < amount_addends) {
