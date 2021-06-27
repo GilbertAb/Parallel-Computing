@@ -15,12 +15,14 @@
 
 #define NUMCOL 10
 
-void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size);
-void free_matrix(const int64_t row_count, void** matrix);
+goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers);
+void free_matrix(const int64_t row_count, goldbach_sums_array_t** matrix);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
-int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
-int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t thread_count);
+int block_mapping_start(int64_t thread_number, int64_t total_numbers,
+  int64_t thread_count);
+int block_mapping_finish(int64_t thread_number, int64_t total_numbers, 
+  int64_t thread_count);
 /**
  * @return zero if succeed
  */
@@ -29,9 +31,7 @@ goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
     calloc(1, sizeof(goldbach_pthread_t));
   
   goldbach_pthread->numbers = numbers;
-  for (int i = 0; i < 11; i++) {
-    printf("%s""%"SCNd64, "\n",array_int64_getElement(goldbach_pthread->numbers,i));
-  }
+
   return goldbach_pthread;
 }
 
@@ -39,7 +39,6 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
   int error = EXIT_SUCCESS;
   
   goldbach_pthread->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
-  printf("%zu", goldbach_pthread->thread_count);
   if (goldbach_pthread) {
     if(argc == 2){
       if (sscanf(argv[1], "%zu", &goldbach_pthread->thread_count) != 1 || errno) {
@@ -47,10 +46,9 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
         error = 1;
       }
     }
-    printf("%zu", goldbach_pthread->thread_count);
     if (error == EXIT_SUCCESS) {
-      goldbach_pthread->goldbach_sums = (array_int64_t*) create_matrix(goldbach_pthread->thread_count
-        , NUMCOL, sizeof(struct array_int64));
+      printf("%s", "Here");
+      goldbach_pthread->goldbach_sums = create_goldbach_sums_matrix(goldbach_pthread->numbers);
     }    
     goldbach_pthread_create_threads(goldbach_pthread);
 
@@ -100,6 +98,10 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
     for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
       pthread_join(threads[index], /*value_ptr*/ NULL);
     }
+    
+    for (int64_t index = 0; index < array_int64_getCount(goldbach_pthread->numbers); index++) {
+      goldbach_sums_array_print(goldbach_pthread->goldbach_sums[index]);
+    }
 
     free(threads);
     free(private_data);
@@ -127,12 +129,20 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
 
   for (int index = private_data->start_index; index < private_data->finish_index; index++) {
     int64_t number = array_int64_getElement(goldbach_pthread->numbers,index);    
-    if (is_even_number(number)) {
-      error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, thread_number);
+    
+    if (number < 0 || number > 5) {
+      if (is_even_number(number)) {
+        error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, thread_number);
+      } else {
+        error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, thread_number);
+      }
     } else {
-      error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, thread_number);
+      /*if (goldbach_pthread) {
+        printf("%"SCNd64 "%s", -number, ": NA\n");
+      } else {
+        printf("%"SCNd64 "%s", number, ": NA\n");
+      }*/
     }
-  }
   return NULL;
 }
 
@@ -152,11 +162,11 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int
     if (isPrime(num1)) {
       for (int64_t num2 = num1; num2 < number; ++num2) {
         if (num1 + num2 == number && isPrime(num2)) {
-          error = array_int64_append(&goldbach_pthread->goldbach_sums[thread_number], num1);
+          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num1);
           if (error) {
             break;
           }
-          error = array_int64_append(&goldbach_pthread->goldbach_sums[thread_number], num2);
+          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num2);
           if (error) {
             break;
           }
@@ -186,15 +196,15 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
         if (isPrime(num2)) {
           for (int64_t num3 = num2; num3 < number; ++num3) {
             if (num1 + num2 + num3 == number && isPrime(num3)) {
-              error = array_int64_append(&goldbach_pthread->goldbach_sums[thread_number], num1);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num1);
               if (error) {
                 break;
               }
-              error = array_int64_append(&goldbach_pthread->goldbach_sums[thread_number], num2);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num2);
               if (error) {
                 break;
               }
-              error = array_int64_append(&goldbach_pthread->goldbach_sums[thread_number], num3);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num3);
               if (error) {
                 break;
               }
@@ -215,27 +225,9 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
  * @param goldbach_sums pointer to the array with the goldbach sums
  */
 void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number/*, array_int64_t * goldbach_sums*/) {
-  int counter = 1;
-  int counterMax = 3;
-  int index = 0;
-
-  if (is_even_number(number)) {
-    counterMax = 2;
-  }
-
-  while (index < array_int64_getCount(goldbach_pthread->goldbach_sums)) {
-    printf("%"SCNd64, array_int64_getElement(goldbach_pthread->goldbach_sums, index));
-    if (counter < counterMax) {
-      printf("%s", " + ");
-      ++counter;
-    } else {
-      if ((index + 1) != array_int64_getCount(goldbach_pthread->goldbach_sums)) {
-        printf("%s", ", ");
-      }
-      counter = 1;
-    }
-    index++;
-  }
+  goldbach_pthread->thread_count = goldbach_pthread->thread_count;
+  number++;
+  
 }
 
 /**
@@ -272,27 +264,35 @@ int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
   return EXIT_SUCCESS;
 }
 
-
-void** create_matrix(int64_t row_count, int64_t col_count, int64_t element_size) {
-  void** matrix = (void**) calloc(row_count, sizeof(void*));
-  if ( matrix == NULL ) {
+goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
+  printf("%s", "Create matrix");
+  goldbach_sums_array_t** matrix = (goldbach_sums_array_t**) 
+    calloc((size_t)array_int64_getCount(numbers), sizeof(goldbach_sums_array_t));
+  if (matrix == NULL) {
     return NULL;
   }
-
-  for (int64_t row = 0; row < row_count; ++row) {
-    if ( (matrix[row] = calloc(col_count, element_size) ) == NULL ) {
-      free_matrix(row_count, matrix);
+  
+  for (int64_t row = 0; row < array_int64_getCount(numbers); ++row) {
+    bool is_negative_number = ((int)array_int64_getElement(numbers,row) < 0) ? true : false;
+    goldbach_sums_array_t* array_goldbach_sums = (goldbach_sums_array_t*) 
+      calloc(1, sizeof(goldbach_sums_array_t));
+    int error = goldbach_sums_array_init(array_goldbach_sums,
+      array_int64_getElement(numbers,row), is_negative_number);
+    if (error) {
+      free_matrix(array_int64_getCount(numbers), matrix);
       return NULL;
     }
+    matrix[row] = array_goldbach_sums;
   }
 
   return matrix;
 }
 
-void free_matrix(const int64_t row_count, void** matrix) {
+void free_matrix(const int64_t row_count, goldbach_sums_array_t** matrix) {
   if (matrix) {
     for (int64_t row = 0; row < row_count; ++row) {
       free(matrix[row]);
+      goldbach_sums_array_destroy(matrix[row]);
     }
   }
 

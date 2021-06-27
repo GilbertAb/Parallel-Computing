@@ -3,12 +3,13 @@
 
 #include <stddef.h>
 #include "array_int64.h"
+#include "goldbach_sums_array.h"
 
 // Shared_data
 typedef struct goldbach_pthread{
   int64_t thread_count;
   array_int64_t* numbers;
-  array_int64_t* goldbach_sums;
+  goldbach_sums_array_t** goldbach_sums;
 } goldbach_pthread_t;
 
 typedef struct  {
