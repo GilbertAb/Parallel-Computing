@@ -5,12 +5,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "array_int64.h"
+#include "goldbach_sums_array.h"
 
-int goldbach(int64_t number, array_int64_t * goldbach_sums);
-int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums);
-int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums);
-void print_goldbach_sums(int64_t number, array_int64_t * goldbachSums);
+int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums);
+int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums);
+int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums);
+void print_goldbach_sums(int64_t number, goldbach_sums_array_t * goldbachSums);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
 
@@ -35,15 +35,15 @@ int main(void) {
       }else{
         printf("%"SCNd64, number);
       }
-      array_int64_t goldbach_sums;
-      error = array_int64_init(&goldbach_sums);
+      goldbach_sums_array_t goldbach_sums;
+      error = goldbach_sums_array_init(&goldbach_sums);
       if (error == EXIT_SUCCESS) {
         error = goldbach(number, &goldbach_sums);
         if (error == EXIT_SUCCESS) {
           if (is_even_number(number)) {
-            amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 2;
+            amountGoldbachSums = goldbach_sums_array_getCount(&goldbach_sums) / 2;
           } else {
-            amountGoldbachSums = array_int64_getCount(&goldbach_sums) / 3;
+            amountGoldbachSums = goldbach_sums_array_getCount(&goldbach_sums) / 3;
           }
       
           printf("%s""%"SCNd64"%s", ": " , amountGoldbachSums, " sums");
@@ -53,7 +53,7 @@ int main(void) {
           }
           printf("%s", "\n");
       
-          array_int64_destroy(&goldbach_sums);
+          goldbach_sums_array_destroy(&goldbach_sums);
         } else {
           fprintf(stderr, "error: could not calculate goldbach sums\n");
         }
@@ -80,7 +80,7 @@ int main(void) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach(int64_t number, array_int64_t * goldbach_sums) {
+int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
 
   if (is_even_number(number)){
@@ -101,18 +101,18 @@ int goldbach(int64_t number, array_int64_t * goldbach_sums) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
+int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums) {
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
     if (isPrime(num1)) {
       for (int64_t num2 = num1; num2 < number; ++num2){
         if (num1 + num2 == number && isPrime(num2)) {
-          error = array_int64_append(goldbach_sums, num1);
+          error = goldbach_sums_array_append(goldbach_sums, num1);
           if (error) {
             break;
           }
-          error = array_int64_append(goldbach_sums, num2);
+          error = goldbach_sums_array_append(goldbach_sums, num2);
           if (error) {
             break;
           }
@@ -133,7 +133,7 @@ int goldbach_strong_conjecture(int64_t number, array_int64_t * goldbach_sums) {
  * @param goldbach_sums pointer to the array with the goldbach sums
  * @return Returns an integer to check errors
  */
-int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums){
+int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums){
   int error = EXIT_SUCCESS;
   
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -142,15 +142,15 @@ int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums){
         if (isPrime(num2)) {
           for (int64_t num3 = num2; num3 < number; ++num3) {
             if (num1 + num2 + num3 == number && isPrime(num3) ) {
-              error = array_int64_append(goldbach_sums, num1);
+              error = goldbach_sums_array_append(goldbach_sums, num1);
               if (error) {
                 break;
               }
-              error = array_int64_append(goldbach_sums, num2);
+              error = goldbach_sums_array_append(goldbach_sums, num2);
               if (error) {
                 break;
               }
-              error = array_int64_append(goldbach_sums, num3);
+              error = goldbach_sums_array_append(goldbach_sums, num3);
               if (error) {
                 break;
               }
@@ -170,7 +170,7 @@ int goldbach_weak_conjecture(int64_t number, array_int64_t * goldbach_sums){
  * @param number The number wich goldbach sums will be printed
  * @param goldbach_sums pointer to the array with the goldbach sums
  */
-void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
+void print_goldbach_sums(int64_t number, goldbach_sums_array_t * goldbach_sums) {
   int counter = 1;
   int counterMax = 3;
   int index = 0;
@@ -179,13 +179,13 @@ void print_goldbach_sums(int64_t number, array_int64_t * goldbach_sums) {
     counterMax = 2;
   }
 
-  while (index < array_int64_getCount(goldbach_sums)) {
-    printf("%"SCNd64, array_int64_getElement(goldbach_sums, index));
+  while (index < goldbach_sums_array_getCount(goldbach_sums)) {
+    printf("%"SCNd64, goldbach_sums_array_getElement(goldbach_sums, index));
     if (counter < counterMax) {
       printf("%s", " + ");
       ++counter;
     } else {
-      if ((index + 1) != array_int64_getCount(goldbach_sums)) {
+      if ((index + 1) != goldbach_sums_array_getCount(goldbach_sums)) {
         printf("%s", ", ");
       }
       counter = 1;

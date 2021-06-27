@@ -4,13 +4,13 @@ EXECUTABLES= $(APPNAME) $(APPNAME)_asan $(APPNAME)_msan
 all: $(EXECUTABLES)
 
 $(APPNAME): $(APPNAME).c
-	cc -g -Wall -Wextra $(APPNAME).c array_int64.c -o $(APPNAME)
+	cc -g -Wall -Wextra $(APPNAME).c goldbach_sums_array.c -o $(APPNAME)
 
 $(APPNAME)_asan: $(APPNAME).c
-	cc -g -Wall -Wextra -fsanitize=address $(APPNAME).c array_int64.c -o $(APPNAME)_asan
+	cc -g -Wall -Wextra -fsanitize=address $(APPNAME).c goldbach_sums_array.c -o $(APPNAME)_asan
 
 $(APPNAME)_msan: $(APPNAME).c
-	clang -g -Wall -Wextra -fsanitize=memory $(APPNAME).c array_int64.c -o $(APPNAME)_msan
+	clang -g -Wall -Wextra -fsanitize=memory $(APPNAME).c goldbach_sums_array.c -o $(APPNAME)_msan
 
 .PHONY: memcheck
 memcheck:
