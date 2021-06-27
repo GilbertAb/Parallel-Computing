@@ -18,8 +18,7 @@ typedef struct goldbach_sums_array{
 } goldbach_sums_array_t;
 
 
-int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number,
-  bool is_negative_number);
+int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number);
 void goldbach_sums_array_destroy(goldbach_sums_array_t* array);
 int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element);
 void goldbach_sums_array_print(goldbach_sums_array_t* array);

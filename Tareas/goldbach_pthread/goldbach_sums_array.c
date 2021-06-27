@@ -15,14 +15,19 @@ void print_sum(goldbach_sums_array_t* array, int64_t index_array, int64_t amount
  * negative or positive.
  * @return returns an integer to check errors.
  */
-int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number,
-  bool is_negative_number) {
+int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number) {
   assert(array);
   array->capacity = 0;
   array->count = 0;
   array->elements = NULL;
-  array->number = number;
-  array->is_negative_number = is_negative_number;
+  if (number < 0) {
+    array->number = number * (-1);
+    array->is_negative_number = true;
+  } else {
+    array->number = number;
+    array->is_negative_number = false;
+  }
+  
   return EXIT_SUCCESS;
 }
 /**
@@ -111,7 +116,7 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
       get_amount_sums(array), " sums");
   
     } else {
-      printf(/*"%s"*/ "%"SCNd64 "%s" "%"SCNd64 "%s", /*"-",*/ array->number,
+      printf("%s" "%"SCNd64 "%s" "%"SCNd64 "%s", "-", array->number,
         ": " , get_amount_sums(array), " sums: ");
     
       if (array->number % 2 == 0) {
@@ -131,12 +136,12 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
       }
     }
   } else {
-    printf("%"SCNd64 "%s", array->number, ": NA");
-    /*if (array->is_negative_number) {
-        printf("%"SCNd64 "%s", -array->number, ": NA");
-      } else {
-        printf("%"SCNd64 "%s", array->number, ": NA");
-      }*/
+    //printf("%"SCNd64 "%s", array->number, ": NA");
+    if (array->is_negative_number) {
+      printf("%"SCNd64 "%s", -array->number, ": NA");
+    } else {
+      printf("%"SCNd64 "%s", array->number, ": NA");
+    }
   }  
   printf("%s", "\n");
 }

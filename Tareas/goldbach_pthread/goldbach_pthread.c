@@ -275,11 +275,11 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
   }
   
   for (int64_t row = 0; row < array_int64_getCount(numbers); ++row) {
-    bool is_negative_number = ((int)array_int64_getElement(numbers,row) < 0) ? true : false;
+    //bool is_negative_number = ((int)array_int64_getElement(numbers,row) < 0) ? true : false;
     goldbach_sums_array_t* array_goldbach_sums = (goldbach_sums_array_t*) 
       calloc(1, sizeof(goldbach_sums_array_t));
     int error = goldbach_sums_array_init(array_goldbach_sums,
-      array_int64_getElement(numbers,row), is_negative_number);
+      array_int64_getElement(numbers,row));
     if (error) {
       free_matrix(array_int64_getCount(numbers), matrix);
       return NULL;
