@@ -20,39 +20,26 @@ bool isPrime(int64_t number);
 int main(void) {
   int64_t error = EXIT_SUCCESS;
   int64_t number = 0;
-  int64_t amountGoldbachSums = 0;
 
   while (scanf("%"SCNd64, &number) == 1) {
-    bool negativeInput = number < 0 ? true : false;
+    bool negative_input = number < 0 ? true : false;
     
-    if(negativeInput){
+    if(negative_input){
       number *= -1;
     }
     
     if (number < 0 || number > 5) {
-      if (negativeInput) {
+      if (negative_input) {
         printf("%"SCNd64, -number);
       }else{
         printf("%"SCNd64, number);
       }
       goldbach_sums_array_t goldbach_sums;
-      error = goldbach_sums_array_init(&goldbach_sums);
+      error = goldbach_sums_array_init(&goldbach_sums, number, negative_input);
       if (error == EXIT_SUCCESS) {
         error = goldbach(number, &goldbach_sums);
         if (error == EXIT_SUCCESS) {
-          if (is_even_number(number)) {
-            amountGoldbachSums = goldbach_sums_array_getCount(&goldbach_sums) / 2;
-          } else {
-            amountGoldbachSums = goldbach_sums_array_getCount(&goldbach_sums) / 3;
-          }
-      
-          printf("%s""%"SCNd64"%s", ": " , amountGoldbachSums, " sums");
-          if (negativeInput){
-            printf("%s", ": ");
-            print_goldbach_sums(number, &goldbach_sums);
-          }
-          printf("%s", "\n");
-      
+          // TODO: print the sums if input is negative, else print num and amount of sums
           goldbach_sums_array_destroy(&goldbach_sums);
         } else {
           fprintf(stderr, "error: could not calculate goldbach sums\n");
@@ -61,7 +48,7 @@ int main(void) {
         fprintf(stderr, "error: could not init goldbach_sums.\n");
       }
     } else {
-      if (negativeInput) {
+      if (negative_input) {
         printf("%"SCNd64 "%s", -number, ": NA\n");
       }else{
         printf("%"SCNd64 "%s", number, ": NA\n");
@@ -171,27 +158,7 @@ int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t * goldbach_su
  * @param goldbach_sums pointer to the array with the goldbach sums
  */
 void print_goldbach_sums(int64_t number, goldbach_sums_array_t * goldbach_sums) {
-  int counter = 1;
-  int counterMax = 3;
-  int index = 0;
-
-  if (is_even_number(number)) {
-    counterMax = 2;
-  }
-
-  while (index < goldbach_sums_array_getCount(goldbach_sums)) {
-    printf("%"SCNd64, goldbach_sums_array_getElement(goldbach_sums, index));
-    if (counter < counterMax) {
-      printf("%s", " + ");
-      ++counter;
-    } else {
-      if ((index + 1) != goldbach_sums_array_getCount(goldbach_sums)) {
-        printf("%s", ", ");
-      }
-      counter = 1;
-    }
-    index++;
-  }
+  
 }
 
 /**

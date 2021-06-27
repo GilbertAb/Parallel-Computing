@@ -12,11 +12,14 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array);
  * @param array pointer to the array to be initialized
  * @return returns an integer to check errors
  */
-int goldbach_sums_array_init(goldbach_sums_array_t* array) {
+int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number,
+  bool is_negative_number) {
   assert(array);
   array->capacity = 0;
   array->count = 0;
   array->elements = NULL;
+  array->number = number;
+  array->is_negative_number = is_negative_number;
   return EXIT_SUCCESS;
 }
 /**
@@ -29,6 +32,8 @@ void goldbach_sums_array_destroy(goldbach_sums_array_t* array) {
   assert(array);
   array->capacity = 0;
   array->count = 0;
+  array->number = 0;
+  array->is_negative_number = false;
   free(array->elements);
 }
 
@@ -76,17 +81,7 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array) {
  * @param array pointer to the array
  * @return returns the count of elements in the array
  */
-int64_t goldbach_sums_array_getCount(goldbach_sums_array_t* array) {
-  return array->count;
-}
 
-/**
- * @brief returns an element of the array
- * @details returns an element of an specific position in the array 
- * @param array pointer to the array
- * @param position position of the element in the array
- * @return returns an element of the array
- */
-int64_t goldbach_sums_array_getElement(goldbach_sums_array_t* array, int64_t position) {
-  return array->elements[position];
+void goldbach_sums_array_print(goldbach_sums_array_t* array) {
+  // TODO: print goldbach sums
 }
