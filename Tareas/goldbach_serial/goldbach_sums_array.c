@@ -4,7 +4,7 @@
 
 
 int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array);
-void print_sum(goldbach_sums_array_t* array, int64_t amount_addends);
+void print_sum(goldbach_sums_array_t* array, int64_t index_array, int64_t amount_addends);
 
 /**
  * @brief initialize the goldbach_sums_array struct
@@ -104,26 +104,27 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
     
     if (array->number % 2 == 0) {
       for (int index = 0; index < array->count; index += 2){ 
-        print_sum(array, 2);
+        print_sum(array, index, 2);
         if (index + 2 < array->count) {
           printf(", ");
         }
       }
     } else {
       for (int index = 0; index < array->count; index += 3){
-        print_sum(array, 3);
+        print_sum(array, index, 3);
         if (index + 3 < array->count) {
           printf(", ");
         }
       }
     }
   }
+  printf("%s", "\n");
 }
 
-void print_sum(goldbach_sums_array_t* array, int64_t amount_addends) {
-  for (int index = 0; index < amount_addends; index++) {
-    printf("%"SCNd64, array->elements[index]);
-    if (index + 1 <= amount_addends) {
+void print_sum(goldbach_sums_array_t* array,int64_t index_array, int64_t amount_addends) {
+  for (int64_t index = 0; index < amount_addends; index++) {
+    printf("%"SCNd64, array->elements[index_array++]);
+    if (index + 1 < amount_addends) {
       printf("%s", " + ");
     }
   }

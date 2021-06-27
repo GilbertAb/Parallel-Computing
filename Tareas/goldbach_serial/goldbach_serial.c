@@ -10,7 +10,6 @@
 int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums);
 int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums);
 int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t * goldbach_sums);
-void print_goldbach_sums(int64_t number, goldbach_sums_array_t * goldbachSums);
 bool is_even_number(int64_t number);
 bool isPrime(int64_t number);
 
@@ -29,17 +28,13 @@ int main(void) {
     }
     
     if (number < 0 || number > 5) {
-      if (negative_input) {
-        printf("%"SCNd64, -number);
-      }else{
-        printf("%"SCNd64, number);
-      }
       goldbach_sums_array_t goldbach_sums;
       error = goldbach_sums_array_init(&goldbach_sums, number, negative_input);
+      
       if (error == EXIT_SUCCESS) {
         error = goldbach(number, &goldbach_sums);
         if (error == EXIT_SUCCESS) {
-          // TODO: print the sums if input is negative, else print num and amount of sums
+          goldbach_sums_array_print(&goldbach_sums);
           goldbach_sums_array_destroy(&goldbach_sums);
         } else {
           fprintf(stderr, "error: could not calculate goldbach sums\n");
@@ -149,16 +144,6 @@ int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t * goldbach_su
   }
   
   return error;
-}
-
-/**
- * @brief Prints the goldbach sums of a number
- * @details Prints the goldbach sums of a number
- * @param number The number wich goldbach sums will be printed
- * @param goldbach_sums pointer to the array with the goldbach sums
- */
-void print_goldbach_sums(int64_t number, goldbach_sums_array_t * goldbach_sums) {
-  
 }
 
 /**
