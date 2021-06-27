@@ -1,5 +1,3 @@
-
-
 #include "goldbach_sums_array.h"
 
 
@@ -136,7 +134,6 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
       }
     }
   } else {
-    //printf("%"SCNd64 "%s", array->number, ": NA");
     if (array->is_negative_number) {
       printf("%"SCNd64 "%s", -array->number, ": NA");
     } else {

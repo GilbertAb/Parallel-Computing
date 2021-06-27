@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     array_int64_append(&numbers, number);
   }
   goldbach_pthread_t* goldbach_pthread = goldbach_pthread_create(&numbers);
-  //printf("%s", "Here");
 
   if (goldbach_pthread) {
     int result = goldbach_pthread_run(goldbach_pthread, argc, argv);

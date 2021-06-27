@@ -79,9 +79,6 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
         private_data[index].thread_number, amount_numbers, amount_threads);
       private_data[index].finish_index = block_mapping_finish(
         private_data[index].thread_number, amount_numbers, amount_threads);
-      
-      /*printf("%s" "%"SCNd64"%s" "%"SCNd64 "%s", "start_index: ", private_data[index].start_index,
-        ", finish_index: ", private_data[index].finish_index, "\n");*/
 
       if (pthread_create(&threads[index], /*attr*/NULL, 
         goldbach_pthread_calculate_goldbach, &private_data[index]
@@ -94,8 +91,6 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
         }
     }
     
-    //printf("Hello from main thread\n");
-
     for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
       pthread_join(threads[index], /*value_ptr*/ NULL);
     }
@@ -123,16 +118,12 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
  */
 void* goldbach_pthread_calculate_goldbach(void* data) {
   int error = EXIT_SUCCESS;
-  error++;
   const private_data_t* private_data = (private_data_t*)data;
   int64_t thread_number = private_data->thread_number;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
   
-  //int64_t counter_numbers = private_data->start_index;
-
   for (int index = private_data->start_index; index < private_data->finish_index; index++) {
     int64_t number = array_int64_getElement(goldbach_pthread->numbers,index);
-    //printf("%"SCNd64 "%s", number, "\n");
     if (number < 0) {
       number *= -1;
     }
@@ -176,7 +167,6 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int
       }
     }
   }
-
   return error;
 }
 
@@ -216,20 +206,7 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
       }
     }
   }
-
   return error;
-}
-
-/**
- * @brief Prints the goldbach sums of a number
- * @details Prints the goldbach sums of a number
- * @param number The number wich goldbach sums will be printed
- * @param goldbach_sums pointer to the array with the goldbach sums
- */
-void print_goldbach_sums(goldbach_pthread_t* goldbach_pthread, int64_t number/*, array_int64_t * goldbach_sums*/) {
-  goldbach_pthread->thread_count = goldbach_pthread->thread_count;
-  number++;
-  
 }
 
 /**
