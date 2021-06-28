@@ -1,7 +1,12 @@
 #ifndef GOLDBACH_PTHREAD
 #define GOLDBACH_PTHREAD
 
-#include <stddef.h>
+#include <assert.h>
+#include <errno.h>
+#include <pthread.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "array_int64.h"
 #include "goldbach_sums_array.h"
 
@@ -37,7 +42,8 @@ goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers);
  * @param argv arguments given in console.
  * @return an integer to check errors.
  */
-int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* argv[]);
+int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
+  char* argv[]);
 
 /**
  * @brief constructs an array with the goldbach sums.
@@ -56,10 +62,11 @@ void* goldbach_pthread_calculate_goldbach(void* data);
  * numbers that conform the sums (they will be accessed in pairs to print).
  * @param goldbach_pthread struct that contains the shared data of the threads.
  * @param number number whose goldbach sums will be calculated.
+ * @param index_number index of number to be calculated.
  * @return an integer to check errors.
  */
 int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread,
-  int64_t number, int64_t thread_number);
+  int64_t number, int64_t index_number);
 
 /**
  * @brief constructs an array with the goldbach sums
@@ -68,10 +75,11 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread,
  * numbers that conform the sums (they will be accessed int trios to print).
  * @param goldbach_pthread struct that contains the shared data of the threads.
  * @param number number whose goldbach sums will be calculated.
+ * @param index_number index of number to be calculated.
  * @return an integer to check errors.
  */
-int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number,
-  int64_t thread_number);
+int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread,
+  int64_t number, int64_t index_number);
 
 /**
  * @brief creates the threads and puts them to do the calculations.

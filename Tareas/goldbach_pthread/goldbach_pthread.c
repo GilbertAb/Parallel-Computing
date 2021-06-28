@@ -1,13 +1,4 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
-#include <assert.h>
-#include <errno.h>
-#include <inttypes.h>
-#include <pthread.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
 
 #include "goldbach_pthread.h"
 
@@ -152,7 +143,6 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
 
 void* goldbach_pthread_calculate_goldbach(void* data) {
   const private_data_t* private_data = (private_data_t*)data;
-  int64_t thread_number = private_data->thread_number;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
   
   for (int index = private_data->start_index; index < private_data->finish_index; index++) {
@@ -172,18 +162,18 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
   return NULL;
 }
 
-int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number) {
+int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t index_number) {
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
     if (isPrime(num1)) {
       for (int64_t num2 = num1; num2 < number; ++num2) {
         if (num1 + num2 == number && isPrime(num2)) {
-          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num1);
+          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[index_number], num1);
           if (error) {
             break;
           }
-          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num2);
+          error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[index_number], num2);
           if (error) {
             break;
           }
@@ -194,7 +184,7 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int
   return error;
 }
 
-int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number) {
+int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t index_number) {
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -203,15 +193,15 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
         if (isPrime(num2)) {
           for (int64_t num3 = num2; num3 < number; ++num3) {
             if (num1 + num2 + num3 == number && isPrime(num3)) {
-              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num1);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[index_number], num1);
               if (error) {
                 break;
               }
-              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num2);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[index_number], num2);
               if (error) {
                 break;
               }
-              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[thread_number], num3);
+              error = goldbach_sums_array_append(goldbach_pthread->goldbach_sums[index_number], num3);
               if (error) {
                 break;
               }

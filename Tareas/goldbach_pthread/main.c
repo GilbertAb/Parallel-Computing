@@ -1,9 +1,6 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 
 #include <stdlib.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <inttypes.h>
 #include "goldbach_pthread.h"
 #include "array_int64.h"
 
