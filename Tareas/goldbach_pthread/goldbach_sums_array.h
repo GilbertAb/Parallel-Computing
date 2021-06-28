@@ -1,5 +1,7 @@
-#ifndef GOLDBACH_SUMS_ARRAY
-#define GOLDBACH_SUMS_ARRAY
+// Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+
+#ifndef TAREAS_GOLDBACH_PTHREAD_GOLDBACH_SUMS_ARRAY_H_
+#define TAREAS_GOLDBACH_PTHREAD_GOLDBACH_SUMS_ARRAY_H_
 
 #include <assert.h>
 #include <inttypes.h>
@@ -9,7 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct goldbach_sums_array{
+typedef struct goldbach_sums_array {
   int64_t capacity;
   int64_t count;
   int64_t* elements;
@@ -49,4 +51,4 @@ int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element);
  * @param array pointer to the array.
  */
 void goldbach_sums_array_print(goldbach_sums_array_t* array);
-#endif  // GOLDBACH_SUMS_ARRAY
+#endif  // TAREAS_GOLDBACH_PTHREAD_GOLDBACH_SUMS_ARRAY_H_

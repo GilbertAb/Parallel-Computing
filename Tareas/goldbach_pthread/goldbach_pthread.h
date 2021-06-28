@@ -1,5 +1,7 @@
-#ifndef GOLDBACH_PTHREAD
-#define GOLDBACH_PTHREAD
+// Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+
+#ifndef TAREAS_GOLDBACH_PTHREAD_GOLDBACH_PTHREAD_H_
+#define TAREAS_GOLDBACH_PTHREAD_GOLDBACH_PTHREAD_H_
 
 #include <assert.h>
 #include <errno.h>
@@ -7,11 +9,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "array_int64.h"
-#include "goldbach_sums_array.h"
+#include "Tareas/goldbach_pthread/array_int64.h"
+#include "Tareas/goldbach_pthread/goldbach_sums_array.h"
 
 // Shared_data
-typedef struct goldbach_pthread{
+typedef struct goldbach_pthread {
   int64_t thread_count;
   array_int64_t* numbers;
   goldbach_sums_array_t** goldbach_sums;
@@ -97,4 +99,5 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread);
  * @return an integer to check errors.
  */
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread);
-#endif  // GOLDBACH_PTHREAD
+
+#endif  // TAREAS_GOLDBACH_PTHREAD_GOLDBACH_PTHREAD_H_

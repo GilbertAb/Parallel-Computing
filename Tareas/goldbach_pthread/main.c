@@ -1,8 +1,8 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 
 #include <stdlib.h>
-#include "goldbach_pthread.h"
-#include "array_int64.h"
+#include "Tareas/goldbach_pthread/goldbach_pthread.h"
+#include "Tareas/goldbach_pthread/array_int64.h"
 
 /**
  * @return zero if succeed
@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   array_int64_t numbers;
   array_int64_init(&numbers);
   int64_t number = 0;
-  
+
   while (scanf("%"SCNd64, &number) == 1) {
     array_int64_append(&numbers, number);
   }

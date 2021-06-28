@@ -36,7 +36,7 @@ gitignore:
 
 .PHONY: lint
 lint:
-	cpplint --filter=-readability/casting $(APPNAME).c
+	cpplint --filter=-readability/casting main.c $(APPNAME).c $(APPNAME).h array_int64.c array_int64.h goldbach_sums_array.c goldbach_sums_array.h
 
 .PHONY: clean
 clean:

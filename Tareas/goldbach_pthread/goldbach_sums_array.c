@@ -1,4 +1,6 @@
-#include "goldbach_sums_array.h"
+// Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
+
+#include "Tareas/goldbach_pthread/goldbach_sums_array.h"
 
 /**
  * @brief returns the amount of sums in the array.
@@ -25,7 +27,8 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array);
  * @param index_array index of the array were the sum starts.
  * @param amount_addends amount of addends that the sum has.
  */
-void print_sum(goldbach_sums_array_t* array, int64_t index_array, int64_t amount_addends);
+void print_sum(goldbach_sums_array_t* array, int64_t index_array,
+  int64_t amount_addends);
 
 int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number) {
   assert(array);
@@ -39,7 +42,7 @@ int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number) {
     array->number = number;
     array->is_negative_number = false;
   }
-  
+
   return EXIT_SUCCESS;
 }
 
@@ -83,7 +86,7 @@ int goldbach_sums_array_increase_capacity(goldbach_sums_array_t* array) {
 
 int64_t get_amount_sums(goldbach_sums_array_t* array) {
   int64_t amount_sums = 0;
-  
+
   if (array->number % 2 == 0) {
     amount_sums = array->count / 2;
   } else {
@@ -93,24 +96,24 @@ int64_t get_amount_sums(goldbach_sums_array_t* array) {
 }
 
 void goldbach_sums_array_print(goldbach_sums_array_t* array) {
-  if (array->number < 0 || array->number > 5 ) {
+  if (array->number < 0 || array->number > 5) {
     if (!array->is_negative_number) {
       printf("%"SCNd64 "%s" "%"SCNd64 "%s", array->number, ": " ,
       get_amount_sums(array), " sums");
-  
+
     } else {
       printf("%s" "%"SCNd64 "%s" "%"SCNd64 "%s", "-", array->number,
         ": " , get_amount_sums(array), " sums: ");
-    
+
       if (array->number % 2 == 0) {
-        for (int index = 0; index < array->count; index += 2){ 
+        for (int index = 0; index < array->count; index += 2) {
           print_sum(array, index, 2);
           if (index + 2 < array->count) {
             printf(", ");
           }
         }
       } else {
-        for (int index = 0; index < array->count; index += 3){
+        for (int index = 0; index < array->count; index += 3) {
           print_sum(array, index, 3);
           if (index + 3 < array->count) {
             printf(", ");
@@ -124,11 +127,11 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
     } else {
       printf("%"SCNd64 "%s", array->number, ": NA");
     }
-  }  
+  }
   printf("%s", "\n");
 }
 
-void print_sum(goldbach_sums_array_t* array,int64_t index_array, 
+void print_sum(goldbach_sums_array_t* array, int64_t index_array,
   int64_t amount_addends) {
   for (int64_t index = 0; index < amount_addends; index++) {
     printf("%"SCNd64, array->elements[index_array++]);
