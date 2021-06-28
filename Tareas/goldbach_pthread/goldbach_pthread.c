@@ -93,11 +93,11 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
     }
     if (error == EXIT_SUCCESS) {
       goldbach_pthread->goldbach_sums = create_goldbach_sums_matrix(goldbach_pthread->numbers);
-    }    
-    goldbach_pthread_create_threads(goldbach_pthread);
+    }
+    error = goldbach_pthread_create_threads(goldbach_pthread);
     free_matrix(array_int64_getCount(goldbach_pthread->numbers), goldbach_pthread->goldbach_sums);
   }
-  return EXIT_SUCCESS;
+  return error;
 }
 
 int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
@@ -151,7 +151,6 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
 }
 
 void* goldbach_pthread_calculate_goldbach(void* data) {
-  int error = EXIT_SUCCESS;
   const private_data_t* private_data = (private_data_t*)data;
   int64_t thread_number = private_data->thread_number;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
@@ -164,9 +163,9 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
 
     if (number < 0 || number > 5) {
       if (number % 2 == 0) {
-        error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
+        goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
       } else {
-        error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, index);
+        goldbach_pthread_weak_conjecture(goldbach_pthread, number, index);
       }
     }
   }  
