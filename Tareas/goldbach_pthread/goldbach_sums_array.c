@@ -128,7 +128,6 @@ void goldbach_sums_array_print(goldbach_sums_array_t* array) {
   printf("%s", "\n");
 }
 
-
 void print_sum(goldbach_sums_array_t* array,int64_t index_array, 
   int64_t amount_addends) {
   for (int64_t index = 0; index < amount_addends; index++) {

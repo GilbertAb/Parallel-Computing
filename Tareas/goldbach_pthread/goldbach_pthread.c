@@ -11,13 +11,10 @@
 
 #include "goldbach_pthread.h"
 
-#define NUMCOL 10
-
 /**
  * @brief creates a matrix of goldbach sums.
  * @details creates a vector of pointers to array_int64 structures(the 
- * goldbach_sums_matrix)).
- * Every number has an array_int64 structure.
+ * goldbach_sums_matrix)). Every number has an array_int64 structure.
  * @param numbers the numbers to create the matrix.
  * @return the matrix.
  */
@@ -54,13 +51,6 @@ int block_mapping_start(int64_t thread_number, int64_t total_numbers,
 */
 int block_mapping_finish(int64_t thread_number, int64_t total_numbers, 
   int64_t thread_count);
-/**
- * @brief returns if a number is even
- * @details proves if a number is divisible by 2
- * @param number the number
- * @return true if a number is even
- */
-bool is_even_number(int64_t number);
 
 /**
  * @brief returns if a number is a prime number
@@ -71,6 +61,15 @@ bool is_even_number(int64_t number);
  */
 bool isPrime(int64_t number);
 
+/**
+* @brief returns the amount of threads that will be created.
+* @details in a case were there are less numbers than threads, the 
+* amount of threads to be created will be equal to the amount of numbers.
+* @param goldbach_pthread struct that contains the shared data of the threads.
+* @param amount_numbers the amount of numbers.
+* @return amount of threads that will be created.
+*/
+int64_t get_amount_threads(goldbach_pthread_t* goldbach_pthread, int64_t amount_numbers);
 
 goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
@@ -112,11 +111,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
 
   if (threads && private_data) {
     int64_t amount_numbers = array_int64_getCount(goldbach_pthread->numbers);
-    int64_t amount_threads = goldbach_pthread->thread_count;
-
-    if (amount_numbers < amount_threads) {
-      amount_threads = amount_numbers;
-    }
+    int64_t amount_threads = get_amount_threads(goldbach_pthread, amount_numbers);
     
     for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
       private_data[index].thread_number = index;
@@ -140,7 +135,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
     for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
       pthread_join(threads[index], /*value_ptr*/ NULL);
     }
-    
+    // Printing the results
     for (int64_t index = 0; index < array_int64_getCount(goldbach_pthread->numbers); index++) {
       goldbach_sums_array_print(goldbach_pthread->goldbach_sums[index]);
     }
@@ -168,7 +163,7 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
     }
 
     if (number < 0 || number > 5) {
-      if (is_even_number(number)) {
+      if (number % 2 == 0) {
         error = goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
       } else {
         error = goldbach_pthread_weak_conjecture(goldbach_pthread, number, index);
@@ -278,10 +273,6 @@ int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t t
   return block_mapping_start(thread_number + 1, total_numbers, thread_count);
 }
 
-bool is_even_number(int64_t number) {
-  return number % 2 == 0;
-}
-
 bool isPrime(int64_t number) {
   bool isPrime = true;
 
@@ -292,4 +283,12 @@ bool isPrime(int64_t number) {
   }
 
   return isPrime;
+}
+
+int64_t get_amount_threads(goldbach_pthread_t* goldbach_pthread, int64_t amount_numbers) {
+  int64_t amount_threads = goldbach_pthread->thread_count;
+  if (amount_numbers < amount_threads) {
+    amount_threads = amount_numbers;
+  }
+  return amount_threads;
 }
