@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "goldbach_sums_array.h"
+#include "Tareas/goldbach_serial/goldbach_sums_array.h"
 
 int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums);
 int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t*
