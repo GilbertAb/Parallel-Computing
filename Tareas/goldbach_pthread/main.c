@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
   if (goldbach_pthread) {
     int result = goldbach_pthread_run(goldbach_pthread, argc, argv);
     goldbach_pthread_destroy(goldbach_pthread);
+    array_int64_destroy(&numbers);
     return result;
   } else {
     fprintf(stderr, "error: could not allocate goldbach_pthread\n");

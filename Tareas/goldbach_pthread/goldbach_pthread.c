@@ -95,7 +95,7 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc, char* a
       goldbach_pthread->goldbach_sums = create_goldbach_sums_matrix(goldbach_pthread->numbers);
     }    
     goldbach_pthread_create_threads(goldbach_pthread);
-
+    free_matrix(array_int64_getCount(goldbach_pthread->numbers), goldbach_pthread->goldbach_sums);
   }
   return EXIT_SUCCESS;
 }
@@ -255,11 +255,10 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
 void free_matrix(const int64_t row_count, goldbach_sums_array_t** matrix) {
   if (matrix) {
     for (int64_t row = 0; row < row_count; ++row) {
-      free(matrix[row]);
       goldbach_sums_array_destroy(matrix[row]);
+      free(matrix[row]);
     }
   }
-
   free(matrix);
 }
 
