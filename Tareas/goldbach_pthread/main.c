@@ -7,6 +7,9 @@
 #include "goldbach_pthread.h"
 #include "array_int64.h"
 
+/**
+ * @return zero if succeed
+ */
 int main(int argc, char* argv[]) {
   array_int64_t numbers;
   array_int64_init(&numbers);

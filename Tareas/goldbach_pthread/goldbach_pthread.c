@@ -9,23 +9,34 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
 #include "goldbach_pthread.h"
-#include "array_int64.h"
 
 #define NUMCOL 10
 
 goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers);
 void free_matrix(const int64_t row_count, goldbach_sums_array_t** matrix);
-bool is_even_number(int64_t number);
-bool isPrime(int64_t number);
+
 int block_mapping_start(int64_t thread_number, int64_t total_numbers,
   int64_t thread_count);
 int block_mapping_finish(int64_t thread_number, int64_t total_numbers, 
   int64_t thread_count);
 /**
- * @return zero if succeed
+ * @brief Returns if a number is even
+ * @details proves if a number is divisible by 2
+ * @param number The number
+ * @return Returns true if a number is even
  */
+bool is_even_number(int64_t number);
+
+/**
+ * @brief Returns if a number is a prime number
+ * @details Determines if a number is a prime number by checking if it
+ * has more than two divisors
+ * @param number The number
+ * @return Returns true if a number is a prime number
+ */
+bool isPrime(int64_t number);
+
 goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
     calloc(1, sizeof(goldbach_pthread_t));
@@ -108,14 +119,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread){
   }
   return error;
 }
-/**
- * @brief Constructs an array with the goldbach sums
- * @details Verifies if the number is even or odd, then calls
- * a conjecture to create the array of goldbach sums
- * @param number The number wich goldbach sums will be find
- * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns an integer to check errors
- */
+
 void* goldbach_pthread_calculate_goldbach(void* data) {
   int error = EXIT_SUCCESS;
   const private_data_t* private_data = (private_data_t*)data;
@@ -139,15 +143,6 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
   return NULL;
 }
 
-/**
- * @brief Constructs an array with the goldbach sums
- * @details The conjecture for even numbers, the first position of the array
- * is the amount of goldbach sums of the number. the next positions are the
- * numbers that conform the sums (they will be accessed in pairs to print)
- * @param number The number wich goldbach sums will be find
- * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns an integer to check errors
- */
 int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number) {
   int error = EXIT_SUCCESS;
 
@@ -170,15 +165,6 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread, int
   return error;
 }
 
-/**
- * @brief Constructs an array with the goldbach sums
- * @details The conjecture for odd numbers, the first position of the array
- * is the amount of goldbach sums of the number. the next positions are the
- * numbers that conform the sums (they will be accessed int trios to print)
- * @param number The number wich goldbach sums will be find
- * @param goldbach_sums pointer to the array with the goldbach sums
- * @return Returns an integer to check errors
- */
 int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64_t number, int64_t thread_number) {
   int error = EXIT_SUCCESS;
 
@@ -209,42 +195,12 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread, int64
   return error;
 }
 
-/**
- * @brief Returns if a number is even
- * @details proves if a number is divisible by 2
- * @param number The number
- * @return Returns true if a number is even
- */
-bool is_even_number(int64_t number) {
-  return number % 2 == 0;
-}
-
-/**
- * @brief Returns if a number is a prime number
- * @details Determines if a number is a prime number by checking if it
- * has more than two divisors
- * @param number The number
- * @return Returns true if a number is a prime number
- */
-bool isPrime(int64_t number) {
-  bool isPrime = true;
-
-  for (int64_t i = 2; i < number; ++i) {
-    if (number % i == 0) {
-      isPrime = false;
-    }
-  }
-
-  return isPrime;
-}
-
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
   free(goldbach_pthread);
   return EXIT_SUCCESS;
 }
 
 goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
-  //printf("%s", "Create matrix\n");
   goldbach_sums_array_t** matrix = (goldbach_sums_array_t**) 
     calloc((size_t)array_int64_getCount(numbers), sizeof(goldbach_sums_array_t));
   if (matrix == NULL) {
@@ -252,7 +208,6 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
   }
   
   for (int64_t row = 0; row < array_int64_getCount(numbers); ++row) {
-    //bool is_negative_number = ((int)array_int64_getElement(numbers,row) < 0) ? true : false;
     goldbach_sums_array_t* array_goldbach_sums = (goldbach_sums_array_t*) 
       calloc(1, sizeof(goldbach_sums_array_t));
     int error = goldbach_sums_array_init(array_goldbach_sums,
@@ -286,4 +241,20 @@ int block_mapping_start(int64_t thread_number, int64_t total_numbers, int64_t th
 
 int block_mapping_finish(int64_t thread_number, int64_t total_numbers, int64_t thread_count) {
   return block_mapping_start(thread_number + 1, total_numbers, thread_count);
+}
+
+bool is_even_number(int64_t number) {
+  return number % 2 == 0;
+}
+
+bool isPrime(int64_t number) {
+  bool isPrime = true;
+
+  for (int64_t i = 2; i < number; ++i) {
+    if (number % i == 0) {
+      isPrime = false;
+    }
+  }
+
+  return isPrime;
 }
