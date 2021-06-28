@@ -1,11 +1,12 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 #include <inttypes.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "Tareas/goldbach_serial/goldbach_sums_array.h"
+#include "goldbach_sums_array.h"
 
 int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums);
 int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t*
@@ -165,13 +166,18 @@ bool is_even_number(int64_t number) {
  * @param number The number
  * @return Returns true if a number is a prime number
  */
+
 bool isPrime(int64_t number) {
   bool isPrime = true;
-
-  for (int64_t i = 2; i < number; ++i) {
-    if (number % i == 0) {
-      isPrime = false;
+  int64_t number_sqrt = (int64_t)sqrt((double)number);
+  if (number % 2 == 0 && 2 < number) {
+    isPrime = false;
+  } else {
+    for (int64_t i = 3; i < number_sqrt + 1; i+=2) {
+      if (number % i == 0) {
+        isPrime = false;
+      }
     }
-  }
+  }  
   return isPrime;
 }
