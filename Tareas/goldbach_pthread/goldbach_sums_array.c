@@ -1,6 +1,6 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 
-#include "Tareas/goldbach_pthread/goldbach_sums_array.h"
+#include "goldbach_sums_array.h"
 
 /**
  * @brief returns the amount of sums in the array.

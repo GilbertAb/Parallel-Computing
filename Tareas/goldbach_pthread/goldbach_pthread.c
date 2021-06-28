@@ -1,6 +1,6 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 
-#include "Tareas/goldbach_pthread/goldbach_pthread.h"
+#include "goldbach_pthread.h"
 
 /**
  * @brief creates a matrix of goldbach sums.
@@ -74,6 +74,7 @@ goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
 
 int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
   char* argv[]) {
+  assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
 
   goldbach_pthread->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
@@ -149,6 +150,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
 }
 
 void* goldbach_pthread_calculate_goldbach(void* data) {
+  assert(data);
   const private_data_t* private_data = (private_data_t*)data;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
 
@@ -172,6 +174,7 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
 
 int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread,
   int64_t number, int64_t index_number) {
+  assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -197,6 +200,7 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread,
 
 int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread,
   int64_t number, int64_t index_number) {
+  assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
 
   for (int64_t num1 = 2; num1 < number && !error; ++num1) {
@@ -230,11 +234,13 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread,
 }
 
 int goldbach_pthread_destroy(goldbach_pthread_t* goldbach_pthread) {
+  assert(goldbach_pthread);
   free(goldbach_pthread);
   return EXIT_SUCCESS;
 }
 
 goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
+  assert(numbers);
   goldbach_sums_array_t** matrix = (goldbach_sums_array_t**)
     calloc((size_t)array_int64_getCount(numbers), sizeof(
     goldbach_sums_array_t));
@@ -253,7 +259,6 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
     }
     matrix[row] = array_goldbach_sums;
   }
-
   return matrix;
 }
 
@@ -281,18 +286,22 @@ int block_mapping_finish(int64_t thread_number, int64_t total_numbers,
 
 bool isPrime(int64_t number) {
   bool isPrime = true;
-
-  for (int64_t i = 2; i < number; ++i) {
-    if (number % i == 0) {
-      isPrime = false;
+  int64_t number_sqrt = (int64_t)sqrt((double)number);
+  if (number % 2 == 0 && 2 < number) {
+    isPrime = false;
+  } else {
+    for (int64_t i = 3; i < number_sqrt + 1; i+=2) {
+      if (number % i == 0) {
+        isPrime = false;
+      }
     }
-  }
-
+  }  
   return isPrime;
 }
 
 int64_t get_amount_threads(goldbach_pthread_t* goldbach_pthread,
   int64_t amount_numbers) {
+  assert(goldbach_pthread);
   int64_t amount_threads = goldbach_pthread->thread_count;
   if (amount_numbers < amount_threads) {
     amount_threads = amount_numbers;

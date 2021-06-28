@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "Tareas/goldbach_pthread/array_int64.h"
+#include "array_int64.h"
 
 
 int array_int64_increase_capacity(array_int64_t* array);

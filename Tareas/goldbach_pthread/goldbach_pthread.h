@@ -5,12 +5,13 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <math.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "Tareas/goldbach_pthread/array_int64.h"
-#include "Tareas/goldbach_pthread/goldbach_sums_array.h"
+#include "array_int64.h"
+#include "goldbach_sums_array.h"
 
 // Shared_data
 typedef struct goldbach_pthread {

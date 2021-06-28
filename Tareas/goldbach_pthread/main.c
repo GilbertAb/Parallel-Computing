@@ -1,8 +1,8 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
 
 #include <stdlib.h>
-#include "Tareas/goldbach_pthread/goldbach_pthread.h"
-#include "Tareas/goldbach_pthread/array_int64.h"
+#include "goldbach_pthread.h"
+#include "array_int64.h"
 
 /**
  * @return zero if succeed
