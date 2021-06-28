@@ -13,29 +13,64 @@
 
 #define NUMCOL 10
 
+/**
+ * @brief creates a matrix of goldbach sums.
+ * @details creates a vector of pointers to array_int64 structures(the 
+ * goldbach_sums_matrix)).
+ * Every number has an array_int64 structure.
+ * @param numbers the numbers to create the matrix.
+ * @return the matrix.
+ */
 goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers);
+
+/**
+ * @brief frees a matrix of goldbach sums.
+ * @details frees a vector of pointers to array_int64 structures(the
+ * goldbach_sums_matrix).
+ * @param row_count the amount of numbers.
+ * @param numbers the matrix.
+ * @return the matrix.
+ */
 void free_matrix(const int64_t row_count, goldbach_sums_array_t** matrix);
 
+/**
+ * @brief returns the start index of a block mapping.
+ * @details calculates and returns the start index of a block mapping.
+ * @param thread_number the number of thread which index will be assigned.
+ * @param total_numbers total of numbers to be assigned between all threads.
+ * @param thread_count the total number of threads.
+ * @return the start index of a block mapping.
+ */
 int block_mapping_start(int64_t thread_number, int64_t total_numbers,
   int64_t thread_count);
+
+/**
+* @brief returns the finish index of a block mapping.
+* @details calculates and returns the finish index of a block mapping.
+* @param thread_number the number of thread which index will be assigned.
+* @param total_numbers total of numbers to be assigned between all threads.
+* @param thread_count the total number of threads.
+* @return the finish index of a block mapping.
+*/
 int block_mapping_finish(int64_t thread_number, int64_t total_numbers, 
   int64_t thread_count);
 /**
- * @brief Returns if a number is even
+ * @brief returns if a number is even
  * @details proves if a number is divisible by 2
- * @param number The number
- * @return Returns true if a number is even
+ * @param number the number
+ * @return true if a number is even
  */
 bool is_even_number(int64_t number);
 
 /**
- * @brief Returns if a number is a prime number
- * @details Determines if a number is a prime number by checking if it
+ * @brief returns if a number is a prime number
+ * @details determines if a number is a prime number by checking if it
  * has more than two divisors
- * @param number The number
- * @return Returns true if a number is a prime number
+ * @param number the number
+ * @return true if a number is a prime number
  */
 bool isPrime(int64_t number);
+
 
 goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)

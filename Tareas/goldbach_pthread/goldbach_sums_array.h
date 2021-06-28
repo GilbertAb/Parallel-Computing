@@ -22,15 +22,15 @@ typedef struct goldbach_sums_array{
  * @details initialize the goldbach_sums_array struct.
  * @param array pointer to the array to be initialized.
  * @param number number which goldbach sums will be calculated.
- * @return returns an integer to check errors.
+ * @return an integer to check errors.
  */
 int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number);
 
 /**
  * @brief destroys the goldbach_sums_array struct.
- * @details initialize the goldbach_sums_array struct.
+ * @details destroys the goldbach_sums_array struct.
  * @param array pointer to the array to be destroyed.
- * @return returns an integer to check errors.
+ * @return an integer to check errors.
  */
 void goldbach_sums_array_destroy(goldbach_sums_array_t* array);
 
@@ -39,7 +39,7 @@ void goldbach_sums_array_destroy(goldbach_sums_array_t* array);
  * @details appends an element to the goldbach_sums_array struct.
  * @param array pointer to the array.
  * @param element element to be Appended.
- * @return returns an integer to check errors.
+ * @return an integer to check errors.
  */
 int goldbach_sums_array_append(goldbach_sums_array_t* array, int64_t element);
 
