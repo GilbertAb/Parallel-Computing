@@ -63,10 +63,14 @@ int array_int64_increase_capacity(array_int64_t* array) {
   int64_t new_capacity = 10 * (array->capacity ? array->capacity : 1);
   int64_t* new_elements = (int64_t*)
     realloc(array->elements, new_capacity * sizeof(int64_t));
-
+  
+  
   if (new_elements) {
     array->capacity = new_capacity;
     array->elements = new_elements;
+    for (int index = 0; index < new_capacity; index++) {
+      array->elements[index] = 0;
+    }
     return EXIT_SUCCESS;
   } else {
     return EXIT_FAILURE;

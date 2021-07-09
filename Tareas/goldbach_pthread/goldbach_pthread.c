@@ -156,11 +156,11 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
 
   for (int index = private_data->start_index; index < private_data
     ->finish_index; index++) {
-    int64_t number = array_int64_getElement(goldbach_pthread->numbers, index);
+    int64_t number = 0;
+    number = array_int64_getElement(goldbach_pthread->numbers, index);
     if (number < 0) {
       number *= -1;
     }
-
     if (number < 0 || number > 5) {
       if (number % 2 == 0) {
         goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
@@ -177,20 +177,19 @@ int goldbach_pthread_strong_conjecture(goldbach_pthread_t* goldbach_pthread,
   assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
 
-  for (int64_t num1 = 2; num1 < number && !error; ++num1) {
-    if (isPrime(num1)) {
-      for (int64_t num2 = num1; num2 < number; ++num2) {
-        if (num1 + num2 == number && isPrime(num2)) {
-          error = goldbach_sums_array_append(goldbach_pthread
-            ->goldbach_sums[index_number], num1);
-          if (error) {
-            break;
-          }
-          error = goldbach_sums_array_append(goldbach_pthread
-            ->goldbach_sums[index_number], num2);
-          if (error) {
-            break;
-          }
+  for (int64_t num1 = 2, num2 = number - 2; num1 <= num2 && !error;
+    ++num1, --num2) {
+    if (isPrime(num1) && isPrime(num2)) {
+      if (num1 + num2 == number) {
+        error = goldbach_sums_array_append(goldbach_pthread
+          ->goldbach_sums[index_number], num1);
+        if (error) {
+          break;
+        }
+        error = goldbach_sums_array_append(goldbach_pthread
+          ->goldbach_sums[index_number], num2);
+        if (error) {
+          break;
         }
       }
     }
@@ -203,29 +202,25 @@ int goldbach_pthread_weak_conjecture(goldbach_pthread_t* goldbach_pthread,
   assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
 
-  for (int64_t num1 = 2; num1 < number && !error; ++num1) {
-    if (isPrime(num1)) {
-      for (int64_t num2 = num1; num2 < number && !error; ++num2) {
-        if (isPrime(num2)) {
-          for (int64_t num3 = num2; num3 < number; ++num3) {
-            if (num1 + num2 + num3 == number && isPrime(num3)) {
-              error = goldbach_sums_array_append(goldbach_pthread
-                ->goldbach_sums[index_number], num1);
-              if (error) {
-                break;
-              }
-              error = goldbach_sums_array_append(goldbach_pthread
-                ->goldbach_sums[index_number], num2);
-              if (error) {
-                break;
-              }
-              error = goldbach_sums_array_append(goldbach_pthread
-                ->goldbach_sums[index_number], num3);
-              if (error) {
-                break;
-              }
-            }
-          }
+  for (int start = 2, last = number - start; start <= last; start++, last--) {
+    for (int medium = start, last_2 = last - medium; medium <= last_2;
+      medium++, last_2--) {
+      if (start + medium + last_2 == number && isPrime(start) &&
+        isPrime(medium) && isPrime(last_2)) {
+        error = goldbach_sums_array_append(goldbach_pthread
+            ->goldbach_sums[index_number], start);;
+        if (error) {
+          break;
+        }
+        error = goldbach_sums_array_append(goldbach_pthread
+            ->goldbach_sums[index_number], medium);
+        if (error) {
+          break;
+        }
+        error = goldbach_sums_array_append(goldbach_pthread
+            ->goldbach_sums[index_number], last_2);
+        if (error) {
+          break;
         }
       }
     }
@@ -289,13 +284,12 @@ bool isPrime(int64_t number) {
   int64_t number_sqrt = (int64_t)sqrt((double)number);
   if (number % 2 == 0 && 2 < number) {
     isPrime = false;
-  } else {
-    for (int64_t i = 3; i < number_sqrt + 1; i+=2) {
-      if (number % i == 0) {
-        isPrime = false;
-      }
+  }
+  for (int64_t i = 3; i < number_sqrt + 1 && isPrime; i+=2) {
+    if (number % i == 0) {
+      isPrime = false;
     }
-  }  
+  }
   return isPrime;
 }
 
