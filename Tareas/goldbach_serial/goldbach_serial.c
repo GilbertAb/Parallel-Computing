@@ -1,10 +1,9 @@
 // Copyright 2021 Gilbert Marquez Aldana <gilbert.marquez@ucr.ac.cr>
-#include <inttypes.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "goldbach_sums_array.h"
 
@@ -22,6 +21,10 @@ bool isPrime(int64_t number);
 int main(void) {
   int64_t error = EXIT_SUCCESS;
   int64_t number = 0;
+
+  // Start time measurement
+  struct timespec start_time;
+  clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &start_time);
 
   while (scanf("%"SCNd64, &number) == 1) {
     bool negative_input = number < 0 ? true : false;
@@ -53,6 +56,14 @@ int main(void) {
     }
   }
 
+  // Finish time measurement
+  struct timespec finish_time;
+  clock_gettime(/*clk_id*/CLOCK_MONOTONIC, &finish_time);
+
+  double elapsed = (finish_time.tv_sec - start_time.tv_sec) +
+    (finish_time.tv_nsec - start_time.tv_nsec) * 1e-9;
+  printf("execution time: %.9lfs\n", elapsed);
+
   return error;
 }
 
@@ -72,7 +83,6 @@ int goldbach(int64_t number, goldbach_sums_array_t * goldbach_sums) {
   } else {
     error = goldbach_weak_conjecture(number, goldbach_sums);
   }
-
   return error;
 }
 
@@ -89,10 +99,10 @@ int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t*
   goldbach_sums) {
   int error = EXIT_SUCCESS;
 
-  for (int64_t num1 = 2; num1 < number && !error; ++num1) {
-    if (isPrime(num1)) {
-      for (int64_t num2 = num1; num2 < number; ++num2) {
-        if (num1 + num2 == number && isPrime(num2)) {
+  for (int64_t num1 = 2, num2 = number - 2; num1 <= num2 && !error;
+    ++num1, --num2) {
+    if (isPrime(num1) && isPrime(num2)) {
+        if (num1 + num2 == number) {
           error = goldbach_sums_array_append(goldbach_sums, num1);
           if (error) {
             break;
@@ -102,10 +112,8 @@ int goldbach_strong_conjecture(int64_t number, goldbach_sums_array_t*
             break;
           }
         }
-      }
     }
   }
-
   return error;
 }
 
@@ -122,26 +130,22 @@ int goldbach_weak_conjecture(int64_t number, goldbach_sums_array_t*
   goldbach_sums) {
   int error = EXIT_SUCCESS;
 
-  for (int64_t num1 = 2; num1 < number && !error; ++num1) {
-    if (isPrime(num1)) {
-      for (int64_t num2 = num1; num2 < number && !error; ++num2) {
-        if (isPrime(num2)) {
-          for (int64_t num3 = num2; num3 < number; ++num3) {
-            if (num1 + num2 + num3 == number && isPrime(num3)) {
-              error = goldbach_sums_array_append(goldbach_sums, num1);
-              if (error) {
-                break;
-              }
-              error = goldbach_sums_array_append(goldbach_sums, num2);
-              if (error) {
-                break;
-              }
-              error = goldbach_sums_array_append(goldbach_sums, num3);
-              if (error) {
-                break;
-              }
-            }
-          }
+  for (int start = 2, last = number - start; start <= last; start++, last--) {
+    for (int medium = start, last_2 = last - medium; medium <= last_2;
+      medium++, last_2--) {
+      if (start + medium + last_2 == number && isPrime(start) &&
+        isPrime(medium) && isPrime(last_2)) {
+        error = goldbach_sums_array_append(goldbach_sums, start);
+        if (error) {
+          break;
+        }
+        error = goldbach_sums_array_append(goldbach_sums, medium);
+        if (error) {
+          break;
+        }
+        error = goldbach_sums_array_append(goldbach_sums, last_2);
+        if (error) {
+          break;
         }
       }
     }
@@ -172,12 +176,11 @@ bool isPrime(int64_t number) {
   int64_t number_sqrt = (int64_t)sqrt((double)number);
   if (number % 2 == 0 && 2 < number) {
     isPrime = false;
-  } else {
-    for (int64_t i = 3; i < number_sqrt + 1; i+=2) {
-      if (number % i == 0) {
-        isPrime = false;
-      }
+  }
+  for (int64_t i = 3; i < number_sqrt + 1 && isPrime; i+=2) {
+    if (number % i == 0) {
+      isPrime = false;
     }
-  }  
+  }
   return isPrime;
 }
