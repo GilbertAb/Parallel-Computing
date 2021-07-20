@@ -1,7 +1,8 @@
 main(argc, argv[]):
+  goldbach_pthread->numbers = create numbers_array(argv[])
   goldbach_pthread_t* goldbach_pthread  
   if goldbach_pthread then
-    goldbach_pthread_create()
+    goldbach_pthread_create(numbers)
     goldbach_pthread_run(goldbach_pthread, argc,argv)
   end if
 
@@ -11,44 +12,75 @@ main(argc, argv[]):
 
 goldbach_pthread_run(goldbach_pthread, argc, argv[]):
   if argc == 2 then
-    shared thread_count := argv[1]
+    shared consumer_count := argv[1]
   else
-    shared thread_count := sysconf(NProcessors)
-
-
-  shared goldbach_sums := goldbach_pthread_create_matrix(thread_count,
+    shared consumer_count := sysconf(NProcessors)
+  
+  shared unit_count := integer(goldbach_pthread->getCount(number))
+  shared queue := create_integer_queue()
+  shared can_access_queue := semaphore(1)
+  shared can_consume := semaphore(0)
+  shared next_unit := 0
+  shared can_access_next_unit := semaphore(1)
+  shared consumed_count := 0
+  shared can_access_consumed_count := semaphore(1)
+  shared goldbach_sums := goldbach_pthread_create_matrix(consumer_count,
      n_sums, element_size)
   
-  goldbach_pthread->numbers = create numbers_array(argv[])
+  goldbach_pthread_create_threads(goldbach_pthread, numbers)
+  goldbach_pthread_print_goldbach_sums(goldbach_pthread)
+
+
+goldbach_pthread_create_threads(goldbach_pthread, numbers):
+  number_count := goldbach_pthread->getCount(number)
+
+  if number_count < consumer_count
+    amount_consumers := number_count
   
-  goldbach_pthread_create_threads(shared_data, numbers)
-
-  goldbach_pthread_print_goldbach_sums(shared_data)
-
-
-goldbach_pthread_create_threads(shared_data, numbers):
-  amount_threads := goldbach_pthread->numbers->count
-
-  if amount_numbers < thread_count
-    amount_threads := amount_numbers
-  
-  for index := 1 to amount_threads do
-    start_index := block_mapping_start(index, numbers.getCount(), amount_threads)
-    last_index := block_mapping_last(index, numbers.getCount(), amount_threads)
-    // calculate_goldbach = heavy_task
-    create_thread(thread[index], calculate_goldbach, shared_data, start_index, last_index, numbers)
-    start_index := start_index + last_index
+  for index := 1 to amount_consumers do
+    create_thread(1, producer)
+    create_threads(consumer_count, consumer)
   end for
 
-  for index := 1 to thread_count do
-    join(thread[index])
-  end for
+  join(producer)
+  join(consumers)
 
-calculate_goldbach(shared_data, start_index, last_index, numbers):
-  for index := start_index to last_index do
+calculate_goldbach(goldbach_pthread, numbers):
     number := argv[index]
     if is_even_number(number)
-      shared_data->goldbah_sums := goldbach_strong_conjecture(number)
+      goldbach_pthread->goldbach_sums := goldbach_strong_conjecture(number)
     else
-      shared_data->goldbah_sums := goldbach_weak_conjecture(number)
-  end for
+      goldbach_pthread->goldbach_sums := goldbach_weak_conjecture(number)
+
+///////////////////////////////////////////////////////////////
+//_______________________producer____________________________//
+//////////////////////////////////////////////////////////////
+producer(goldbach_pthread):
+  for int := 1 to goldbach_pthread->getCount(number)
+    my_unit:= goldbach_pthread->getNumber()
+    wait(can_access_queue)
+      enqueue(queue, my_unit)
+    signal(can_access_queue)
+    // unit produced
+    signal(can_consume)
+
+///////////////////////////////////////////////////////////////
+//_______________________consumer____________________________//
+//////////////////////////////////////////////////////////////
+
+consumer:
+  while true do
+    wait(can_access_consumed_count)
+      if consumed_count >= unit_count then
+        signal(can_access_consumed_count)
+        break while
+      end if
+      consumed_count := consumed_count + 1
+    signal(can_access_consumed_count)
+    wait(can_consume)
+    wait(can_access_queue)
+      my_unit := dequeue(queue)
+      // unit consumed
+      signal(can_access_queue)
+    calculate_goldbach(my_unit)
+  end while
