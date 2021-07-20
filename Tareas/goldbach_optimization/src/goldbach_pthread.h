@@ -11,22 +11,9 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "array_int64.h"
-#include "block_mapping.h"
+#include "common.h"
 #include "goldbach_sums_array.h"
 
-// Shared_data
-typedef struct goldbach_pthread {
-  int64_t thread_count;
-  array_int64_t* numbers;
-  goldbach_sums_array_t** goldbach_sums;
-} goldbach_pthread_t;
-
-typedef struct  {
-  int64_t start_index;
-  int64_t finish_index;
-  int64_t thread_number;
-  goldbach_pthread_t* goldbach_pthread;
-} private_data_t;
 
 /**
  * @brief creates and initialize the goldbach_sums_array struct.

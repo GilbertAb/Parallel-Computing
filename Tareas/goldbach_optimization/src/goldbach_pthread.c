@@ -43,11 +43,11 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
   char* argv[]) {
   assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
-  // Assign thread_count
-  goldbach_pthread->thread_count = sysconf(_SC_NPROCESSORS_ONLN);
+  // Assign consumer_count
+  goldbach_pthread->consumer_count = sysconf(_SC_NPROCESSORS_ONLN);
   if (goldbach_pthread) {
     if (argc == 2) {
-      if (sscanf(argv[1], "%zu", &goldbach_pthread->thread_count) != 1
+      if (sscanf(argv[1], "%zu", &goldbach_pthread->consumer_count) != 1
         || errno) {
         fprintf(stderr, "error: invalid thread count\n");
         error = 1;
@@ -72,28 +72,25 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
   int error = EXIT_SUCCESS;
   
   // Allocate space for threads and their respective private data
-  pthread_t* threads = (pthread_t*) calloc(goldbach_pthread->thread_count
+  pthread_t* threads = (pthread_t*) calloc(goldbach_pthread->consumer_count
     , sizeof(pthread_t));
   private_data_t* private_data = (private_data_t*)
-    calloc(goldbach_pthread->thread_count, sizeof(private_data_t));
+    calloc(goldbach_pthread->consumer_count, sizeof(private_data_t));
 
   if (threads && private_data) {
     int64_t numbers_count = array_int64_getCount(goldbach_pthread->numbers);
-    int64_t thread_count = goldbach_pthread->thread_count;
+    int64_t consumer_count = goldbach_pthread->consumer_count;
     // If there are more threads than numbers, then use as many threads as 
     // numbers
-    if (numbers_count < thread_count) {
-      thread_count = numbers_count;
+    if (numbers_count < consumer_count) {
+      consumer_count = numbers_count;
     }
 
-    for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
+    for (int64_t index = 0; index < goldbach_pthread->consumer_count; ++index) {
       private_data[index].thread_number = index;
       private_data[index].goldbach_pthread = goldbach_pthread;
       // Get working block for every thread
-      private_data[index].start_index = block_mapping_start(
-        private_data[index].thread_number, numbers_count, thread_count);
-      private_data[index].finish_index = block_mapping_finish(
-        private_data[index].thread_number, numbers_count, thread_count);
+
       // Create thread and make it work with it's respective working block
       if (pthread_create(&threads[index], /*attr*/NULL,
         goldbach_pthread_calculate_goldbach, &private_data[index])
@@ -101,12 +98,12 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
       } else {
           fprintf(stderr, "error: could not create thread %zu\n", index);
           error = 21;
-          goldbach_pthread->thread_count = index;
+          goldbach_pthread->consumer_count = index;
           break;
         }
     }
     // Join of threads after finishing their work
-    for (int64_t index = 0; index < goldbach_pthread->thread_count; ++index) {
+    for (int64_t index = 0; index < goldbach_pthread->consumer_count; ++index) {
       pthread_join(threads[index], /*value_ptr*/ NULL);
     }
     // Printing the results
@@ -119,7 +116,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
     free(private_data);
   } else {
     fprintf(stderr, "Could not allocate memory for %zu threads\n"
-      , goldbach_pthread->thread_count);
+      , goldbach_pthread->consumer_count);
     error = 22;
   }
   return error;
@@ -129,23 +126,21 @@ void* goldbach_pthread_calculate_goldbach(void* data) {
   assert(data);
   const private_data_t* private_data = (private_data_t*)data;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
-  // Calculate numbers inside the block (between start_index and finish_index)
-  for (int index = private_data->start_index; index < private_data
-    ->finish_index; index++) {
-    int64_t number = array_int64_getElement(goldbach_pthread->numbers, index);
-    // Change number to positive if it is negative
-    if (number < 0) {
-      number *= -1;
-    }
-    // If number is smaller than 6, it doesn't have any goldbach sum
-    if (number > 5) {
-      if (number % 2 == 0) {
-        goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
-      } else {
-        goldbach_pthread_weak_conjecture(goldbach_pthread, number, index);
-      }
-    }
+  // Calculate number sums
+  /*int64_t number = array_int64_getElement(goldbach_pthread->numbers, index);
+  // Change number to positive if it is negative
+  if (number < 0) {
+    number *= -1;
   }
+  // If number is smaller than 6, it doesn't have any goldbach sum
+  if (number > 5) {
+    if (number % 2 == 0) {
+      goldbach_pthread_strong_conjecture(goldbach_pthread, number, index);
+    } else {
+      goldbach_pthread_weak_conjecture(goldbach_pthread, number, index);
+    }
+  }*/
+  
   return NULL;
 }
 
