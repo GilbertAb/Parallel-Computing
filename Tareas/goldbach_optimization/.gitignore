@@ -5,3 +5,4 @@ goldbach_pthread_tsan
 html/
 latex/
 *.o
+doc/
