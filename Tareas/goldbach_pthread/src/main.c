@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
   while (scanf("%"SCNd64, &number) == 1) {
     array_int64_append(&numbers, number);
   }
+
   goldbach_pthread_t* goldbach_pthread = goldbach_pthread_create(&numbers);
 
   if (goldbach_pthread) {

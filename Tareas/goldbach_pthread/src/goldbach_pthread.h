@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "array_int64.h"
+#include "block_mapping.h"
 #include "goldbach_sums_array.h"
 
 // Shared_data

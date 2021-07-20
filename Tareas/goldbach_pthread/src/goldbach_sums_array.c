@@ -37,7 +37,7 @@ int goldbach_sums_array_init(goldbach_sums_array_t* array, int64_t number) {
   array->elements = NULL;
   array->number = number;
   array->is_negative_number = false;
-  
+
   if (number < 0) {
     array->number = number * (-1);
     array->is_negative_number = true;
