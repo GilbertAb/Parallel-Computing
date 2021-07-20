@@ -1,0 +1,7 @@
+goldbach_pthread
+goldbach_pthread_asan
+goldbach_pthread_msan
+goldbach_pthread_tsan
+html/
+latex/
+*.o
