@@ -12,13 +12,13 @@
 
 #include "array_int64.h"
 #include "goldbach_sums_array.h"
-#include "queue.h"
+#include "goldbach_number_queue.h"
 
 // Shared data
 typedef struct goldbach_pthread {
   array_int64_t* numbers;
   int64_t unit_count;
-  queue_t queue;
+  goldbach_number_queue_t queue;
   // thread_count
   int64_t consumer_count;
   sem_t can_consume;
@@ -30,7 +30,7 @@ typedef struct goldbach_pthread {
 } goldbach_pthread_t;
 
 typedef struct  {
-  int64_t number;
+  goldbach_number_t goldbach_number;
   int64_t thread_number;
   goldbach_pthread_t* goldbach_pthread;
 } private_data_t;

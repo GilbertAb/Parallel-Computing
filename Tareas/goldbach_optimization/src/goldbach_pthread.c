@@ -71,6 +71,7 @@ int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
   if (threads && private_data) {
     int64_t numbers_count = array_int64_getCount(goldbach_pthread->numbers);
     int64_t consumer_count = goldbach_pthread->consumer_count;
+    //goldbach_number_queue_enqueue(&goldbach_pthread->queue, private_data->goldbach_number);
     // If there are more threads than numbers, then use as many threads as 
     // numbers
     if (numbers_count < consumer_count) {

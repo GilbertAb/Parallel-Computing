@@ -7,7 +7,9 @@ void* goldbach_calculator_calculate_goldbach(void* data) {
   const private_data_t* private_data = (private_data_t*)data;
   goldbach_pthread_t* goldbach_pthread = private_data->goldbach_pthread;
   // Calculate number sums
-  int64_t number = private_data->number;
+  goldbach_number_t goldbach_number = private_data->goldbach_number;
+  int64_t number = goldbach_number.number;
+  int64_t index = goldbach_number.index;
   // Change number to positive if it is negative
   if (number < 0) {
     number *= -1;
@@ -17,9 +19,9 @@ void* goldbach_calculator_calculate_goldbach(void* data) {
   // If number is smaller than 6, it doesn't have any goldbach sum
   if (number > 5) {
     if (number % 2 == 0) {
-      goldbach_calculator_strong_conjecture(goldbach_pthread, number, /*index*/0);
+      goldbach_calculator_strong_conjecture(goldbach_pthread, number, index);
     } else {
-      goldbach_calculator_weak_conjecture(goldbach_pthread, number, /*index*/0);
+      goldbach_calculator_weak_conjecture(goldbach_pthread, number, index);
     }
   }
   

@@ -4,42 +4,45 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "queue.h"
+#include "goldbach_number_queue.h"
 
-void queue_remove_first_unsafe(queue_t* queue);
-bool queue_is_empty_unsafe(const queue_t* queue);
+void goldbach_number_queue_remove_first_unsafe(goldbach_number_queue_t* queue);
+bool goldbach_number_queue_is_empty_unsafe(const 
+  goldbach_number_queue_t* queue);
 
-int queue_init(queue_t* queue) {
+int goldbach_number_queue_init(goldbach_number_queue_t* queue) {
   assert(queue);
   queue->head = NULL;
   queue->tail = NULL;
   return pthread_mutex_init(&queue->can_access_queue, NULL);
 }
 
-int queue_destroy(queue_t* queue) {
-  queue_clear(queue);
+int goldbach_number_queue_destroy(goldbach_number_queue_t* queue) {
+  goldbach_number_queue_clear(queue);
   return pthread_mutex_destroy(&queue->can_access_queue);
 }
 
-bool queue_is_empty_unsafe(const queue_t* queue) {
+bool goldbach_number_queue_is_empty_unsafe(const 
+  goldbach_number_queue_t* queue) {
   assert(queue);
   return queue->head == NULL;
 }
 
-bool queue_is_empty(queue_t* queue) {
+bool goldbach_number_queue_is_empty(goldbach_number_queue_t* queue) {
   assert(queue);
   pthread_mutex_lock(&queue->can_access_queue);
-  bool result = queue_is_empty_unsafe(queue);
+  bool result = goldbach_number_queue_is_empty_unsafe(queue);
   pthread_mutex_unlock(&queue->can_access_queue);
   return result;
 }
 
-int queue_enqueue(queue_t* queue, const size_t data) {
+int goldbach_number_queue_enqueue(goldbach_number_queue_t* queue,
+  const goldbach_number_t data) {
   assert(queue);
   int error = EXIT_SUCCESS;
 
-  queue_node_t* new_node = (queue_node_t*)
-    calloc(1, sizeof(queue_node_t));
+  goldbach_number_queue_node_t* new_node = (goldbach_number_queue_node_t*)
+    calloc(1, sizeof(goldbach_number_queue_node_t));
 
   if (new_node) {
     new_node->data = data;
@@ -58,16 +61,17 @@ int queue_enqueue(queue_t* queue, const size_t data) {
   return error;
 }
 
-int queue_dequeue(queue_t* queue, size_t* data) {
+int goldbach_number_queue_dequeue(goldbach_number_queue_t* queue,
+  goldbach_number_t* data) {
   assert(queue);
   int error = 0;
 
   pthread_mutex_lock(&queue->can_access_queue);
-    if (!queue_is_empty_unsafe(queue)) {
+    if (!goldbach_number_queue_is_empty_unsafe(queue)) {
       if (data) {
         *data = queue->head->data;
       }
-      queue_remove_first_unsafe(queue);
+      goldbach_number_queue_remove_first_unsafe(queue);
     } else {
       error = EXIT_FAILURE;
     }
@@ -76,10 +80,10 @@ int queue_dequeue(queue_t* queue, size_t* data) {
   return error;
 }
 
-void queue_remove_first_unsafe(queue_t* queue) {
+void goldbach_number_queue_remove_first_unsafe(goldbach_number_queue_t* queue) {
   assert(queue);
-  assert(!queue_is_empty_unsafe(queue));
-  queue_node_t* node = queue->head;
+  assert(!goldbach_number_queue_is_empty_unsafe(queue));
+  goldbach_number_queue_node_t* node = queue->head;
   queue->head = queue->head->next;
   free(node);
   if (queue->head == NULL) {
@@ -87,11 +91,11 @@ void queue_remove_first_unsafe(queue_t* queue) {
   }
 }
 
-void queue_clear(queue_t* queue) {
+void goldbach_number_queue_clear(goldbach_number_queue_t* queue) {
   assert(queue);
   pthread_mutex_lock(&queue->can_access_queue);
-    while (!queue_is_empty_unsafe(queue)) {
-      queue_remove_first_unsafe(queue);
+    while (!goldbach_number_queue_is_empty_unsafe(queue)) {
+      goldbach_number_queue_remove_first_unsafe(queue);
     }
   pthread_mutex_unlock(&queue->can_access_queue);
 }
