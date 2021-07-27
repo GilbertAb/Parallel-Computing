@@ -30,6 +30,7 @@ typedef struct goldbach_pthread {
 } goldbach_pthread_t;
 
 typedef struct  {
+  int64_t number;
   int64_t thread_number;
   goldbach_pthread_t* goldbach_pthread;
 } private_data_t;
