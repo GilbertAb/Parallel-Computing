@@ -19,7 +19,8 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers);
  * @param numbers the matrix.
  * @return the matrix.
  */
-void free_goldbach_sums_matrix(const int64_t row_count, goldbach_sums_array_t** matrix);
+void free_goldbach_sums_matrix(const int64_t row_count,
+  goldbach_sums_array_t** matrix);
 
 goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
@@ -27,11 +28,11 @@ goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
 
   if (goldbach_pthread) {
     goldbach_pthread->numbers = numbers;
-    goldbach_pthread->unit_count = array_int64_getCount(goldbach_pthread->numbers);
+    goldbach_pthread->unit_count =
+      array_int64_getCount(goldbach_pthread->numbers);
     goldbach_number_queue_init(&goldbach_pthread->queue);
     goldbach_pthread->consumed_count = 0;
     sem_init(&goldbach_pthread->can_consume, 0, 0);
-    // todo: change for mutex
     sem_init(&goldbach_pthread->can_access_next_unit, 0, 1);
     goldbach_pthread->next_unit = 0;
     sem_init(&goldbach_pthread->can_access_consumed_count, 0, 1);
@@ -61,18 +62,16 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
       goldbach_pthread->goldbach_sums = create_goldbach_sums_matrix(
         goldbach_pthread->numbers);
     }
-    // Create threads
-    //error = goldbach_pthread_create_threads(goldbach_pthread);
-    
+    // Create consumers and producers
     error = create_consumers_producers(goldbach_pthread);
-    
+    // Print the results
     for (int64_t index = 0; index < array_int64_getCount(
       goldbach_pthread->numbers); index++) {
       goldbach_sums_array_print(goldbach_pthread->goldbach_sums[index]);
     }
-    
+
     goldbach_number_queue_destroy(&goldbach_pthread->queue);
-    //free(queue);
+
     // Free matrix after all calculations finished
     free_goldbach_sums_matrix(array_int64_getCount(goldbach_pthread->numbers),
       goldbach_pthread->goldbach_sums);
@@ -86,8 +85,8 @@ int create_consumers_producers(goldbach_pthread_t* goldbach_pthread) {
   int64_t producer_count = 1;
   pthread_t* producer = create_threads(producer_count, produce
     , goldbach_pthread);
-  pthread_t* consumers = create_threads(goldbach_pthread->consumer_count, consume
-    , goldbach_pthread);
+  pthread_t* consumers = create_threads(goldbach_pthread->consumer_count,
+    consume, goldbach_pthread);
 
   if (producer && consumers) {
     wait_threads(producer_count, producer);
@@ -103,7 +102,8 @@ int create_consumers_producers(goldbach_pthread_t* goldbach_pthread) {
   return error;
 }
 
-pthread_t* create_threads(size_t count, void*(*subroutine)(void*), goldbach_pthread_t* data) {
+pthread_t* create_threads(size_t count, void*(*subroutine)(void*),
+  goldbach_pthread_t* data) {
   pthread_t* threads = (pthread_t*) calloc(count, sizeof(pthread_t));
   // Create as many private_data as threads
   private_data_t* private_data = (private_data_t*)
@@ -113,12 +113,13 @@ pthread_t* create_threads(size_t count, void*(*subroutine)(void*), goldbach_pthr
       private_data[index].thread_number = index;
       // data is goldbach_pthread (shared_data)
       private_data[index].goldbach_pthread = data;
-      // "Link" threads with its private_data (GoldbachNumbers are stored here when consumed)
-      if (pthread_create(&threads[index], /*attr*/ NULL, subroutine, &private_data[index])
-         == EXIT_SUCCESS) {
+
+      // "Link" threads with its private_data (GoldbachNumbers are
+      // stored in each private_data when consumed)
+      if (pthread_create(&threads[index], /*attr*/ NULL, subroutine,
+        &private_data[index]) == EXIT_SUCCESS) {
       } else {
         fprintf(stderr, "error: could not create thread %zu\n", index);
-        // todo: destroy created threads and return NULL
         break;
       }
     }
@@ -129,7 +130,6 @@ pthread_t* create_threads(size_t count, void*(*subroutine)(void*), goldbach_pthr
 int wait_threads(size_t count, pthread_t* threads) {
   int error = EXIT_SUCCESS;
   for (size_t index = 0; index < count; ++index) {
-    // todo: sum could not be right
     error += pthread_join(threads[index], /*value_ptr*/ NULL);
   }
   free(threads);
@@ -165,7 +165,7 @@ goldbach_sums_array_t** create_goldbach_sums_matrix(array_int64_t* numbers) {
   return matrix;
 }
 
-void free_goldbach_sums_matrix(const int64_t row_count, 
+void free_goldbach_sums_matrix(const int64_t row_count,
   goldbach_sums_array_t** matrix) {
   if (matrix) {
     for (int64_t row = 0; row < row_count; ++row) {

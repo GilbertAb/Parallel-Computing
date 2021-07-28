@@ -4,6 +4,9 @@
 #ifndef PRODUCER_H
 #define PRODUCER_H
 
+#include <stdio.h>
+#include "common.h"
+
 void* produce(void* data);
 
 #endif  // PRODUCER_H

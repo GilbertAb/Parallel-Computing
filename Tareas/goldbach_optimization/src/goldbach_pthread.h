@@ -5,16 +5,10 @@
 
 #include <assert.h>
 #include <errno.h>
-#include <math.h>
 #include <pthread.h>
-#include <stdbool.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include "array_int64.h"
 #include "common.h"
 #include "consumer.h"
-#include "goldbach_calculator.h"
-#include "goldbach_sums_array.h"
 #include "producer.h"
 
 /**
@@ -39,7 +33,8 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
   char* argv[]);
 
 int create_consumers_producers(goldbach_pthread_t* goldbach_pthread);
-pthread_t* create_threads(size_t count, void*(*subroutine)(void*), goldbach_pthread_t* data);
+pthread_t* create_threads(size_t count, void*(*subroutine)(void*),
+  goldbach_pthread_t* data);
 int wait_threads(size_t count, pthread_t* threads);
 /**
  * @brief creates the threads and puts them to do the calculations.

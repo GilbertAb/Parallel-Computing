@@ -4,6 +4,11 @@
 #ifndef CONSUMER_H
 #define CONSUMER_H
 
+#include <stdbool.h>
+#include <stdio.h>
+#include "goldbach_calculator.h"
+#include "common.h"
+
 void* consume(void* data);
 
 #endif  // CONSUMER_H

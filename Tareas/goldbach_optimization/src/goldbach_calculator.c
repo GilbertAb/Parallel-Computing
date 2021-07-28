@@ -15,7 +15,6 @@ void* goldbach_calculator_calculate_goldbach(void* data) {
     number *= -1;
   }
 
-  // TODO: index should be passed from goldbach_pthread
   // If number is smaller than 6, it doesn't have any goldbach sum
   if (number > 5) {
     if (number % 2 == 0) {
@@ -24,7 +23,7 @@ void* goldbach_calculator_calculate_goldbach(void* data) {
       goldbach_calculator_weak_conjecture(goldbach_pthread, number, index);
     }
   }
-  
+
   return NULL;
 }
 

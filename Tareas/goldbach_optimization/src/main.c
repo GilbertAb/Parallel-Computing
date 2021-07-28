@@ -12,7 +12,7 @@ int main(int argc, char* argv[]) {
   array_int64_t numbers;
   array_int64_init(&numbers);
   int64_t number = 0;
-  
+
   while (scanf("%"SCNd64, &number) == 1) {
     array_int64_append(&numbers, number);
   }

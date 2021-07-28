@@ -6,7 +6,6 @@
 
 #include <pthread.h>
 #include <stdbool.h>
-//#include "common.h"
 
 typedef struct  {
   int64_t number;

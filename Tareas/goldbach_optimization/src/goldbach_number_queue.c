@@ -7,7 +7,7 @@
 #include "goldbach_number_queue.h"
 
 void goldbach_number_queue_remove_first_unsafe(goldbach_number_queue_t* queue);
-bool goldbach_number_queue_is_empty_unsafe(const 
+bool goldbach_number_queue_is_empty_unsafe(const
   goldbach_number_queue_t* queue);
 
 int goldbach_number_queue_init(goldbach_number_queue_t* queue) {
@@ -22,7 +22,7 @@ int goldbach_number_queue_destroy(goldbach_number_queue_t* queue) {
   return pthread_mutex_destroy(&queue->can_access_queue);
 }
 
-bool goldbach_number_queue_is_empty_unsafe(const 
+bool goldbach_number_queue_is_empty_unsafe(const
   goldbach_number_queue_t* queue) {
   assert(queue);
   return queue->head == NULL;
