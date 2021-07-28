@@ -25,7 +25,19 @@ goldbach_pthread_t* goldbach_pthread_create(array_int64_t* numbers) {
   goldbach_pthread_t* goldbach_pthread = (goldbach_pthread_t*)
     calloc(1, sizeof(goldbach_pthread_t));
 
-  goldbach_pthread->numbers = numbers;
+  if (goldbach_pthread) {
+    goldbach_pthread->numbers = numbers;
+    goldbach_pthread->unit_count = array_int64_getCount(goldbach_pthread->numbers);
+    goldbach_number_queue_init(&goldbach_pthread->queue);
+    goldbach_pthread->consumed_count = 0;
+    sem_init(&goldbach_pthread->can_consume, 0, 0);
+    // todo: change for mutex
+    sem_init(&goldbach_pthread->can_access_next_unit, 0, 1);
+    goldbach_pthread->next_unit = 0;
+    sem_init(&goldbach_pthread->can_access_consumed_count, 0, 1);
+    goldbach_pthread->consumed_count = 0;
+  }
+
 
   return goldbach_pthread;
 }
@@ -50,7 +62,17 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
         goldbach_pthread->numbers);
     }
     // Create threads
-    error = goldbach_pthread_create_threads(goldbach_pthread);
+    //error = goldbach_pthread_create_threads(goldbach_pthread);
+    
+    error = create_consumers_producers(goldbach_pthread);
+    
+    for (int64_t index = 0; index < array_int64_getCount(
+      goldbach_pthread->numbers); index++) {
+      goldbach_sums_array_print(goldbach_pthread->goldbach_sums[index]);
+    }
+    
+    goldbach_number_queue_destroy(&goldbach_pthread->queue);
+    //free(queue);
     // Free matrix after all calculations finished
     free_goldbach_sums_matrix(array_int64_getCount(goldbach_pthread->numbers),
       goldbach_pthread->goldbach_sums);
@@ -58,59 +80,59 @@ int goldbach_pthread_run(goldbach_pthread_t* goldbach_pthread, int argc,
   return error;
 }
 
-int goldbach_pthread_create_threads(goldbach_pthread_t* goldbach_pthread) {
+int create_consumers_producers(goldbach_pthread_t* goldbach_pthread) {
   assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
-  
-  // Allocate space for threads and their respective private data
-  pthread_t* threads = (pthread_t*) calloc(goldbach_pthread->consumer_count
-    , sizeof(pthread_t));
-  private_data_t* private_data = (private_data_t*)
-    calloc(goldbach_pthread->consumer_count, sizeof(private_data_t));
+  int64_t producer_count = 1;
+  pthread_t* producer = create_threads(producer_count, produce
+    , goldbach_pthread);
+  pthread_t* consumers = create_threads(goldbach_pthread->consumer_count, consume
+    , goldbach_pthread);
 
-  if (threads && private_data) {
-    int64_t numbers_count = array_int64_getCount(goldbach_pthread->numbers);
-    int64_t consumer_count = goldbach_pthread->consumer_count;
-    //goldbach_number_queue_enqueue(&goldbach_pthread->queue, private_data->goldbach_number);
-    // If there are more threads than numbers, then use as many threads as 
-    // numbers
-    if (numbers_count < consumer_count) {
-      consumer_count = numbers_count;
-    }
-
+  if (producer && consumers) {
+    wait_threads(producer_count, producer);
     for (int64_t index = 0; index < goldbach_pthread->consumer_count; ++index) {
-      private_data[index].thread_number = index;
-      private_data[index].goldbach_pthread = goldbach_pthread;
-      // Get working block for every thread
-
-      // Create thread and make it work with it's respective working block
-      if (pthread_create(&threads[index], /*attr*/NULL,
-        goldbach_calculator_calculate_goldbach, &private_data[index])
-        == EXIT_SUCCESS) {
-      } else {
-          fprintf(stderr, "error: could not create thread %zu\n", index);
-          error = 21;
-          goldbach_pthread->consumer_count = index;
-          break;
-        }
+      sem_post(&goldbach_pthread->can_consume);
     }
-    // Join of threads after finishing their work
-    for (int64_t index = 0; index < goldbach_pthread->consumer_count; ++index) {
-      pthread_join(threads[index], /*value_ptr*/ NULL);
-    }
-    // Printing the results
-    for (int64_t index = 0; index < array_int64_getCount(
-      goldbach_pthread->numbers); index++) {
-      goldbach_sums_array_print(goldbach_pthread->goldbach_sums[index]);
-    }
-    // Free memory
-    free(threads);
-    free(private_data);
+    wait_threads(goldbach_pthread->consumer_count, consumers);
   } else {
-    fprintf(stderr, "Could not allocate memory for %zu threads\n"
-      , goldbach_pthread->consumer_count);
+    fprintf(stderr, "error: could not allocate create threads\n");
     error = 22;
   }
+
+  return error;
+}
+
+pthread_t* create_threads(size_t count, void*(*subroutine)(void*), goldbach_pthread_t* data) {
+  pthread_t* threads = (pthread_t*) calloc(count, sizeof(pthread_t));
+  // Create as many private_data as threads
+  private_data_t* private_data = (private_data_t*)
+    calloc(count, sizeof(private_data_t));
+  if (threads) {
+    for (size_t index = 0; index < count; ++index) {
+      private_data[index].thread_number = index;
+      // data is goldbach_pthread (shared_data)
+      private_data[index].goldbach_pthread = data;
+      // "Link" threads with its private_data (GoldbachNumbers are stored here when consumed)
+      if (pthread_create(&threads[index], /*attr*/ NULL, subroutine, &private_data[index])
+         == EXIT_SUCCESS) {
+      } else {
+        fprintf(stderr, "error: could not create thread %zu\n", index);
+        // todo: destroy created threads and return NULL
+        break;
+      }
+    }
+  }
+  return threads;
+}
+
+int wait_threads(size_t count, pthread_t* threads) {
+  int error = EXIT_SUCCESS;
+  for (size_t index = 0; index < count; ++index) {
+    // todo: sum could not be right
+    error += pthread_join(threads[index], /*value_ptr*/ NULL);
+  }
+  free(threads);
   return error;
 }
 
