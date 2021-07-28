@@ -83,11 +83,14 @@ int create_consumers_producers(goldbach_pthread_t* goldbach_pthread) {
   assert(goldbach_pthread);
   int error = EXIT_SUCCESS;
   int64_t producer_count = 1;
+  // Create 1 thread(producer) to produce
   pthread_t* producer = create_threads(producer_count, produce
     , goldbach_pthread);
+  // Create as many threads(consumers) as the user asked to consume
   pthread_t* consumers = create_threads(goldbach_pthread->consumer_count,
     consume, goldbach_pthread);
 
+  // join of threads
   if (producer && consumers) {
     wait_threads(producer_count, producer);
     for (int64_t index = 0; index < goldbach_pthread->consumer_count; ++index) {
